@@ -81,7 +81,12 @@ export default function App() {
       tp: 0, mg: "", pv: 0,
     }));
     setStudents(init);
-    save(init, [], 1, "독서록 3편 작성하기", []);
+    setTxs([]);
+    setWeek(1);
+    setMission("독서록 3편 작성하기");
+    setEvts([]);
+    setTicketLog([]);
+    save(init, [], 1, "독서록 3편 작성하기", [], []);
   }
 
   const persist = useCallback((s, t, w, m, e) => {
