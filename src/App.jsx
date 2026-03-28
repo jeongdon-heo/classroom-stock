@@ -77,7 +77,7 @@ export default function App() {
     })();
   }, []);
 
-  async function initSample() {
+  function initSample() {
     const init = SAMPLE_STUDENTS.map(s => ({
       ...s, stockPrice: DEFAULT_STOCK_PRICE,
       history: [{ week: 0, price: DEFAULT_STOCK_PRICE, label: "시작" }],
@@ -90,7 +90,7 @@ export default function App() {
     setMission("독서록 3편 작성하기");
     setEvts([]);
     setTicketLog([]);
-    await save(init, [], 1, "독서록 3편 작성하기", [], []);
+    save(init, [], 1, "독서록 3편 작성하기", [], []);
   }
 
   const persist = useCallback((s, t, w, m, e) => {
@@ -164,9 +164,9 @@ export default function App() {
     persist(up, txs, week + 1, "", evts);
   }
 
-  async function resetAll() {
+  function resetAll() {
     if (!window.confirm("모든 데이터를 초기화합니까?")) return;
-    await initSample();
+    initSample();
     window.alert("초기화가 완료되었습니다!");
   }
 
