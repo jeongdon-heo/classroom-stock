@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, AreaChart, Area, BarChart, Bar, CartesianGrid } from "recharts";
 import { TrendingUp, TrendingDown, Users, Award, Settings, BarChart3, ArrowUpRight, ArrowDownRight, ShoppingCart, DollarSign, Star, Zap, Trophy, Plus, Minus, ChevronRight, X, Check, AlertTriangle, Sparkles, Building2, PiggyBank, Megaphone, Vote, Target, Gift, RefreshCw, Trash2, Edit3, Save, Crown, Medal, GraduationCap, Printer, FileText } from "lucide-react";
+import { db } from "./firebase";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 const SAMPLE_STUDENTS = [
   { id: 1, name: "김도윤", company: "깔끔 주식회사", slogan: "교실 정리의 달인!", emoji: "🧹" },
@@ -45,32 +47,34 @@ export default function App() {
   const [showReport, setShowReport] = useState(false);
   const [ticketLog, setTicketLog] = useState([]);
 
-  const save = useCallback((s, t, w, m, e, tl) => {
+  const save = useCallback(async (s, t, w, m, e, tl) => {
     try {
-      localStorage.setItem("s42-students", JSON.stringify(s));
-      localStorage.setItem("s42-txs", JSON.stringify(t));
-      localStorage.setItem("s42-meta", JSON.stringify({ w, m }));
-      localStorage.setItem("s42-evts", JSON.stringify(e));
-      if (tl !== undefined) localStorage.setItem("s42-tickets", JSON.stringify(tl));
-    } catch (err) { console.error(err); }
+      await setDoc(doc(db, "classroom", "students"), { data: JSON.stringify(s) });
+      await setDoc(doc(db, "classroom", "txs"), { data: JSON.stringify(t) });
+      await setDoc(doc(db, "classroom", "meta"), { w, m });
+      await setDoc(doc(db, "classroom", "evts"), { data: JSON.stringify(e) });
+      if (tl !== undefined) await setDoc(doc(db, "classroom", "tickets"), { data: JSON.stringify(tl) });
+    } catch (err) { console.error("Firestore save error:", err); }
   }, []);
 
   useEffect(() => {
-    try {
-      const r = localStorage.getItem("s42-students");
-      if (r) {
-        setStudents(JSON.parse(r));
-        const t = localStorage.getItem("s42-txs");
-        setTxs(t ? JSON.parse(t) : []);
-        const m = localStorage.getItem("s42-meta");
-        if (m) { const d = JSON.parse(m); setWeek(d.w || 1); setMission(d.m || ""); }
-        const e = localStorage.getItem("s42-evts");
-        setEvts(e ? JSON.parse(e) : []);
-        const tl = localStorage.getItem("s42-tickets");
-        setTicketLog(tl ? JSON.parse(tl) : []);
-      } else { initSample(); }
-    } catch { initSample(); }
-    setLoading(false);
+    (async () => {
+      try {
+        const snap = await getDoc(doc(db, "classroom", "students"));
+        if (snap.exists()) {
+          setStudents(JSON.parse(snap.data().data));
+          const tSnap = await getDoc(doc(db, "classroom", "txs"));
+          setTxs(tSnap.exists() ? JSON.parse(tSnap.data().data) : []);
+          const mSnap = await getDoc(doc(db, "classroom", "meta"));
+          if (mSnap.exists()) { const d = mSnap.data(); setWeek(d.w || 1); setMission(d.m || ""); }
+          const eSnap = await getDoc(doc(db, "classroom", "evts"));
+          setEvts(eSnap.exists() ? JSON.parse(eSnap.data().data) : []);
+          const tlSnap = await getDoc(doc(db, "classroom", "tickets"));
+          setTicketLog(tlSnap.exists() ? JSON.parse(tlSnap.data().data) : []);
+        } else { initSample(); }
+      } catch (err) { console.error("Firestore load error:", err); initSample(); }
+      setLoading(false);
+    })();
   }, []);
 
   function initSample() {
@@ -96,7 +100,7 @@ export default function App() {
 
   const saveTickets = useCallback((tl) => {
     setTicketLog(tl);
-    try { localStorage.setItem("s42-tickets", JSON.stringify(tl)); } catch {}
+    try { setDoc(doc(db, "classroom", "tickets"), { data: JSON.stringify(tl) }); } catch {}
   }, []);
 
   function portfolioVal(port, studs) {
