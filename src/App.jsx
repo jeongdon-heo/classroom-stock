@@ -71,13 +71,23 @@ export default function App() {
           setEvts(eSnap.exists() ? JSON.parse(eSnap.data().data) : []);
           const tlSnap = await getDoc(doc(db, "classroom", "tickets"));
           setTicketLog(tlSnap.exists() ? JSON.parse(tlSnap.data().data) : []);
-        } else { initSample(); }
-      } catch (err) { console.error("Firestore load error:", err); initSample(); }
+        } else { initEmpty(); }
+      } catch (err) { console.error("Firestore load error:", err); initEmpty(); }
       setLoading(false);
     })();
   }, []);
 
-  function initSample() {
+  function initEmpty() {
+    setStudents([]);
+    setTxs([]);
+    setWeek(1);
+    setMission("");
+    setEvts([]);
+    setTicketLog([]);
+    save([], [], 1, "", [], []);
+  }
+
+  function loadSample() {
     const init = SAMPLE_STUDENTS.map(s => ({
       ...s, stockPrice: DEFAULT_STOCK_PRICE,
       history: [{ week: 0, price: DEFAULT_STOCK_PRICE, label: "시작" }],
@@ -167,7 +177,7 @@ export default function App() {
   function resetAll() {
     if (!window.confirm("모든 데이터를 초기화합니까?")) return;
     try {
-      initSample();
+      initEmpty();
       window.alert("초기화가 완료되었습니다!");
     } catch (err) {
       window.alert("초기화 오류: " + err.message);
@@ -216,7 +226,7 @@ export default function App() {
         {tab === "dashboard" && <Dashboard students={students} txs={txs} week={week} onSel={setSelStudent} portfolioVal={portfolioVal} />}
         {tab === "trade" && <Trade students={students} doTrade={doTrade} txs={txs} />}
         {tab === "ranking" && <Ranking students={students} portfolioVal={portfolioVal} />}
-        {tab === "admin" && <Admin students={students} setStudents={s => persist(s, txs, week, mission, evts)} week={week} mission={mission} setMission={m => persist(students, txs, week, m, evts)} evts={evts} setEvts={e => persist(students, txs, week, mission, e)} settle={settle} resetAll={resetAll} showAdd={showAdd} setShowAdd={setShowAdd} persist={persist} txs={txs} showReport={showReport} setShowReport={setShowReport} portfolioVal={portfolioVal} ticketLog={ticketLog} saveTickets={saveTickets} />}
+        {tab === "admin" && <Admin students={students} setStudents={s => persist(s, txs, week, mission, evts)} week={week} mission={mission} setMission={m => persist(students, txs, week, m, evts)} evts={evts} setEvts={e => persist(students, txs, week, mission, e)} settle={settle} resetAll={resetAll} loadSample={loadSample} showAdd={showAdd} setShowAdd={setShowAdd} persist={persist} txs={txs} showReport={showReport} setShowReport={setShowReport} portfolioVal={portfolioVal} ticketLog={ticketLog} saveTickets={saveTickets} />}
       </main>
 
       {selStudent && <Modal onClose={() => setSelStudent(null)}><Detail s={students.find(x => x.id === selStudent)} students={students} txs={txs} portfolioVal={portfolioVal} /></Modal>}
@@ -573,7 +583,7 @@ function Ranking({ students, portfolioVal }) {
 // ─── ADMIN ───
 const sb = { padding: "4px 10px", background: "rgba(100,130,255,0.06)", border: "1px solid rgba(120,140,255,0.1)", borderRadius: 6, cursor: "pointer", fontSize: 12, fontWeight: 600 };
 
-function Admin({ students, setStudents, week, mission, setMission, evts, setEvts, settle, resetAll, showAdd, setShowAdd, persist, txs, showReport, setShowReport, portfolioVal, ticketLog, saveTickets }) {
+function Admin({ students, setStudents, week, mission, setMission, evts, setEvts, settle, resetAll, loadSample, showAdd, setShowAdd, persist, txs, showReport, setShowReport, portfolioVal, ticketLog, saveTickets }) {
   const [sub, setSub] = useState("ticket");
   const [nm, setNm] = useState(mission);
   const [ed, setEd] = useState("");
@@ -886,6 +896,7 @@ function Admin({ students, setStudents, week, mission, setMission, evts, setEvts
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
             <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: "#9cb8ff" }}>👥 학생 관리</h3>
             <div style={{ display: "flex", gap: 8 }}>
+              <button onClick={() => { if (window.confirm("예시 데이터(8명)를 불러올까요?")) { loadSample(); window.alert("예시 데이터를 불러왔습니다!"); } }} style={{ display: "flex", alignItems: "center", gap: 4, padding: "8px 14px", background: "rgba(255,171,64,0.1)", border: "1px solid rgba(255,171,64,0.2)", borderRadius: 8, color: "#ffab40", cursor: "pointer", fontSize: 12, fontWeight: 600 }}><Sparkles size={14} /> 예시 데이터</button>
               <button onClick={() => setShowBulk(true)} style={{ display: "flex", alignItems: "center", gap: 4, padding: "8px 14px", background: "rgba(179,136,255,0.1)", border: "1px solid rgba(179,136,255,0.2)", borderRadius: 8, color: "#b388ff", cursor: "pointer", fontSize: 12, fontWeight: 600 }}><Users size={14} /> 일괄 등록</button>
               <button onClick={() => setShowAdd(true)} style={{ display: "flex", alignItems: "center", gap: 4, padding: "8px 14px", background: "rgba(76,223,139,0.1)", border: "1px solid rgba(76,223,139,0.2)", borderRadius: 8, color: "#4cdf8b", cursor: "pointer", fontSize: 12, fontWeight: 600 }}><Plus size={14} /> 개별 추가</button>
               <button onClick={resetAll} style={{ display: "flex", alignItems: "center", gap: 4, padding: "8px 14px", background: "rgba(255,107,122,0.1)", border: "1px solid rgba(255,107,122,0.2)", borderRadius: 8, color: "#ff6b7a", cursor: "pointer", fontSize: 12 }}><Trash2 size={14} /> 초기화</button>
