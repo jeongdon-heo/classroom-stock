@@ -167,6 +167,7 @@ export default function App() {
   async function resetAll() {
     if (!window.confirm("모든 데이터를 초기화합니까?")) return;
     await initSample();
+    window.alert("초기화가 완료되었습니다!");
   }
 
   if (loading) return (
