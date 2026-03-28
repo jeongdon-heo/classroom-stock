@@ -166,8 +166,12 @@ export default function App() {
 
   function resetAll() {
     if (!window.confirm("모든 데이터를 초기화합니까?")) return;
-    initSample();
-    window.alert("초기화가 완료되었습니다!");
+    try {
+      initSample();
+      window.alert("초기화가 완료되었습니다!");
+    } catch (err) {
+      window.alert("초기화 오류: " + err.message);
+    }
   }
 
   if (loading) return (
