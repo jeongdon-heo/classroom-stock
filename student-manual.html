@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏢 4-2 주식회사 - 학생 매뉴얼</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: #f8f9fc;
+    color: #2d3748;
+    line-height: 1.8;
+    font-size: 15px;
+  }
+
+  .page {
+    max-width: 720px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 48px 40px;
+  }
+
+  /* 인쇄 설정 */
+  @media print {
+    body { background: #fff; font-size: 13px; }
+    .page { padding: 20px 10px; max-width: 100%; }
+    .no-print { display: none !important; }
+    .step-card { break-inside: avoid; }
+    h2 { break-after: avoid; }
+    @page { margin: 15mm 10mm; }
+  }
+
+  .print-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    padding: 14px 28px;
+    background: linear-gradient(135deg, #4a6cf7, #6366f1);
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(99,102,241,0.35);
+    font-family: 'Noto Sans KR', sans-serif;
+    z-index: 100;
+  }
+  .print-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(99,102,241,0.45); }
+
+  /* 타이틀 */
+  .title-section {
+    text-align: center;
+    padding: 32px 0 28px;
+    border-bottom: 3px solid #4a6cf7;
+    margin-bottom: 36px;
+  }
+  .title-emoji { font-size: 56px; margin-bottom: 8px; }
+  .title-main {
+    font-size: 32px;
+    font-weight: 900;
+    color: #1a202c;
+    letter-spacing: -0.5px;
+  }
+  .title-sub {
+    font-size: 16px;
+    color: #718096;
+    margin-top: 6px;
+    font-weight: 400;
+  }
+
+  /* 섹션 */
+  h2 {
+    font-size: 22px;
+    font-weight: 800;
+    color: #1a202c;
+    margin: 40px 0 16px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  h2 .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    background: linear-gradient(135deg, #4a6cf7, #6366f1);
+    color: #fff;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+
+  h3 {
+    font-size: 17px;
+    font-weight: 700;
+    color: #2d3748;
+    margin: 20px 0 10px;
+  }
+
+  p { margin-bottom: 12px; }
+
+  /* 스텝 카드 */
+  .step-card {
+    background: #f7f8fc;
+    border: 1px solid #e8ecf4;
+    border-radius: 14px;
+    padding: 20px 24px;
+    margin: 14px 0;
+  }
+  .step-card.highlight {
+    background: linear-gradient(135deg, #eef2ff, #f0f0ff);
+    border-color: #c7d2fe;
+  }
+  .step-card.warning {
+    background: #fff8f0;
+    border-color: #fed7aa;
+  }
+  .step-card.success {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+  }
+
+  .step-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #4a6cf7;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* 테이블 */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 14px;
+  }
+  th, td {
+    padding: 10px 14px;
+    text-align: center;
+    border: 1px solid #e2e8f0;
+  }
+  th {
+    background: #f1f5f9;
+    font-weight: 700;
+    color: #475569;
+    font-size: 13px;
+  }
+  td { color: #334155; }
+  tr:nth-child(even) td { background: #fafbfd; }
+
+  /* 예시 박스 */
+  .example-box {
+    background: #fffbeb;
+    border: 1px dashed #f59e0b;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin: 14px 0;
+    font-size: 14px;
+  }
+  .example-box .label {
+    font-weight: 700;
+    color: #d97706;
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+
+  /* 용어 정리 */
+  .term {
+    display: inline-block;
+    background: #eef2ff;
+    color: #4338ca;
+    padding: 2px 10px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  /* 리스트 */
+  ul, ol {
+    padding-left: 22px;
+    margin: 8px 0 14px;
+  }
+  li { margin-bottom: 6px; }
+
+  /* 강조 */
+  strong { color: #1e293b; }
+  em { color: #6366f1; font-style: normal; font-weight: 600; }
+
+  /* 워크시트 */
+  .worksheet {
+    border: 2px solid #cbd5e1;
+    border-radius: 14px;
+    padding: 24px;
+    margin: 20px 0;
+    background: #fff;
+  }
+  .worksheet h3 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 18px;
+  }
+  .ws-field {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    font-size: 15px;
+  }
+  .ws-label {
+    font-weight: 700;
+    min-width: 100px;
+    color: #475569;
+  }
+  .ws-blank {
+    flex: 1;
+    border-bottom: 2px dotted #94a3b8;
+    min-height: 28px;
+    padding: 4px 0;
+  }
+
+  /* 플로우 */
+  .flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 16px 0;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .flow-item {
+    background: #eef2ff;
+    padding: 8px 16px;
+    border-radius: 10px;
+    color: #4338ca;
+    text-align: center;
+  }
+  .flow-arrow { color: #94a3b8; font-size: 20px; }
+
+  /* 팁 박스 */
+  .tip-box {
+    background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+    border: 1px solid #86efac;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin: 14px 0;
+  }
+  .tip-box .tip-title {
+    font-weight: 700;
+    color: #15803d;
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  .footer {
+    text-align: center;
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 2px solid #e2e8f0;
+    color: #94a3b8;
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+
+<button class="print-btn no-print" onclick="window.print()">🖨️ 인쇄하기</button>
+
+<div class="page">
+
+  <!-- 타이틀 -->
+  <div class="title-section">
+    <div class="title-emoji">🏢</div>
+    <div class="title-main">4-2 주식회사</div>
+    <div class="title-sub">학생 매뉴얼 — 나만의 1인 기업 만들기</div>
+  </div>
+
+  <!-- ==================== STEP 1 ==================== -->
+  <h2><span class="num">1</span> 나만의 1인 기업 세우기</h2>
+
+  <p>우리 반 모든 친구들은 <em>CEO(대표이사)</em>가 됩니다! 자신만의 회사를 세우고, 열심히 활동해서 주가를 올려보세요.</p>
+
+  <h3>🏗️ 기업을 세우려면 이 3가지를 정해야 해요</h3>
+
+  <div class="step-card highlight">
+    <div class="step-title">① 회사 이름</div>
+    <p>멋진 이름을 지어주세요. "~주식회사", "~컴퍼니", "~랩", "~기업" 등 자유롭게!</p>
+  </div>
+  <div class="step-card highlight">
+    <div class="step-title">② 회사 슬로건</div>
+    <p>우리 회사가 어떤 회사인지 한 줄로 소개해 봅시다. 짧고 기억에 남게!</p>
+  </div>
+  <div class="step-card highlight">
+    <div class="step-title">③ 회사 이모지</div>
+    <p>회사를 대표하는 이모지(그림 문자) 1개를 골라주세요. (예: 🚀 💡 🎨 ⚽ 📚)</p>
+  </div>
+
+  <div class="example-box">
+    <div class="label">💡 예시를 볼까요?</div>
+    <table>
+      <tr><th>CEO 이름</th><th>회사 이름</th><th>슬로건</th><th>이모지</th></tr>
+      <tr><td>김도윤</td><td>깔끔 주식회사</td><td>교실 정리의 달인!</td><td>🧹</td></tr>
+      <tr><td>이서연</td><td>아이디어 랩</td><td>창의력이 폭발하는 회사</td><td>💡</td></tr>
+      <tr><td>박지호</td><td>수학왕 컴퍼니</td><td>문제 해결의 천재들</td><td>🔢</td></tr>
+      <tr><td>최유나</td><td>책벌레 기업</td><td>독서로 세상을 바꾸자!</td><td>📚</td></tr>
+    </table>
+  </div>
+
+  <!-- 워크시트 -->
+  <div class="worksheet">
+    <h3>✏️ 나의 기업 설계서</h3>
+    <div class="ws-field">
+      <span class="ws-label">CEO 이름</span>
+      <div class="ws-blank"></div>
+    </div>
+    <div class="ws-field">
+      <span class="ws-label">회사 이름</span>
+      <div class="ws-blank"></div>
+    </div>
+    <div class="ws-field">
+      <span class="ws-label">슬로건</span>
+      <div class="ws-blank"></div>
+    </div>
+    <div class="ws-field">
+      <span class="ws-label">이모지</span>
+      <div class="ws-blank"></div>
+    </div>
+  </div>
+
+  <div class="step-card success">
+    <div class="step-title">🎉 기업이 세워지면 이렇게 시작해요</div>
+    <ul>
+      <li><strong>시작 주가:</strong> 1,000원</li>
+      <li><strong>시작 현금:</strong> 10,000원</li>
+    </ul>
+    <p>앞으로 열심히 활동하면 주가가 오르고, 현금도 늘어납니다!</p>
+  </div>
+
+
+  <!-- ==================== STEP 2 ==================== -->
+  <h2><span class="num">2</span> 주가가 뭐예요?</h2>
+
+  <p><span class="term">주가</span>란 내 회사의 가치를 숫자로 나타낸 것이에요. 내가 학교에서 열심히 활동하면 주가가 올라가고, 그렇지 않으면 내려갑니다.</p>
+
+  <h3>📊 주가에 영향을 주는 것들</h3>
+
+  <table>
+    <tr><th>항목</th><th>내용</th><th>주가 영향</th></tr>
+    <tr><td>⭐ 선생님 포인트</td><td>수업 태도, 과제, 생활 평가</td><td>최대 +300 / -200</td></tr>
+    <tr><td>🎯 주간 미션</td><td>매주 주어지는 미션 수행</td><td>S(+500) A(+300) B(+100) 미완수(-100)</td></tr>
+    <tr><td>🗳️ 친구 평가</td><td>친구들이 투표로 평가</td><td>상위 30%: +400 / 중위: +100 / 하위 30%: -100</td></tr>
+    <tr><td>⚡ 특별 이벤트</td><td>깜짝 보너스나 페널티</td><td>상황에 따라 다름</td></tr>
+  </table>
+
+  <div class="tip-box">
+    <div class="tip-title">💡 핵심 포인트</div>
+    <p>매주 <strong>정산</strong>이 이루어지면, 위의 모든 포인트가 합산되어 주가에 반영됩니다. 한 주도 빠짐없이 열심히!</p>
+  </div>
+
+
+  <!-- ==================== STEP 3 ==================== -->
+  <h2><span class="num">3</span> 돈은 어떻게 벌어요?</h2>
+
+  <p>CEO에게는 매주 정산 때 <em>두 가지 수입</em>이 들어옵니다.</p>
+
+  <div class="step-card">
+    <div class="step-title">💰 CEO 급여</div>
+    <p>정산 후 내 주가의 <strong>10%</strong>가 현금으로 지급됩니다.</p>
+    <p style="color:#6366f1; font-size:14px;">예: 주가 1,500원이면 → 급여 150원</p>
+  </div>
+
+  <div class="step-card">
+    <div class="step-title">📦 사업 수익 (미션 보상)</div>
+    <p>주간 미션 등급에 따라 추가 현금을 받습니다.</p>
+    <table>
+      <tr><th>미션 등급</th><th>S</th><th>A</th><th>B</th><th>미완수</th></tr>
+      <tr><td><strong>사업 수익</strong></td><td>+300원</td><td>+200원</td><td>+100원</td><td>0원</td></tr>
+    </table>
+  </div>
+
+  <div class="step-card">
+    <div class="step-title">🎫 행운권</div>
+    <p>아침활동, 독서록, 돌발미션 등으로 행운권을 받을 수 있어요.</p>
+    <ul>
+      <li><strong>가상 화폐로 전환:</strong> 행운권 1장 = 100원 (현금에 바로 추가!)</li>
+      <li><strong>실물 행운권:</strong> 경매 등에서 사용 가능</li>
+    </ul>
+  </div>
+
+  <div class="example-box">
+    <div class="label">📝 이번 주 수입 계산 예시</div>
+    <p>도윤이의 이번 주: 주가 2,000원, 미션 A등급, 행운권 2장(가상화폐 전환)</p>
+    <table>
+      <tr><th>항목</th><th>금액</th></tr>
+      <tr><td>CEO 급여 (2,000 × 10%)</td><td>+200원</td></tr>
+      <tr><td>사업 수익 (A등급)</td><td>+200원</td></tr>
+      <tr><td>행운권 (2장 × 100원)</td><td>+200원</td></tr>
+      <tr><td><strong>이번 주 총 수입</strong></td><td><strong>+600원</strong></td></tr>
+    </table>
+  </div>
+
+
+  <!-- ==================== STEP 4 ==================== -->
+  <h2><span class="num">4</span> 주식 거래하기</h2>
+
+  <p>모은 현금으로 <em>친구 회사의 주식</em>을 사고팔 수 있습니다!</p>
+
+  <h3>📈 매수 (사기)</h3>
+  <div class="step-card">
+    <div class="step-title">주식을 살 때</div>
+    <ol>
+      <li>거래소 탭에서 <strong>"매수"</strong>를 선택합니다.</li>
+      <li><strong>투자자</strong>(나)를 선택합니다.</li>
+      <li>사고 싶은 <strong>친구의 회사</strong>를 선택합니다.</li>
+      <li><strong>수량</strong>을 정합니다. (한 회사당 최대 3주까지)</li>
+      <li>"매수하기" 버튼을 누릅니다.</li>
+    </ol>
+    <p style="font-size:14px; color:#64748b;">내 현금에서 <strong>주가 × 수량</strong>만큼 빠져나갑니다.</p>
+  </div>
+
+  <h3>📉 매도 (팔기)</h3>
+  <div class="step-card">
+    <div class="step-title">주식을 팔 때</div>
+    <ol>
+      <li>거래소 탭에서 <strong>"매도"</strong>를 선택합니다.</li>
+      <li><strong>투자자</strong>(나)를 선택합니다.</li>
+      <li>팔고 싶은 <strong>회사</strong>를 선택합니다.</li>
+      <li>팔 <strong>수량</strong>을 정합니다.</li>
+      <li>"매도하기" 버튼을 누릅니다.</li>
+    </ol>
+    <p style="font-size:14px; color:#64748b;">내 현금에 <strong>현재 주가 × 수량</strong>만큼 들어옵니다.</p>
+  </div>
+
+  <div class="step-card warning">
+    <div class="step-title">⚠️ 거래 규칙</div>
+    <ul>
+      <li><strong>자기 회사 주식은 살 수 없어요.</strong> (다른 친구 회사만 가능)</li>
+      <li><strong>한 회사당 최대 3주</strong>까지만 보유할 수 있어요.</li>
+      <li><strong>현금이 부족하면</strong> 매수할 수 없어요.</li>
+      <li>갖고 있지 않은 주식은 매도할 수 없어요.</li>
+    </ul>
+  </div>
+
+  <div class="example-box">
+    <div class="label">📝 거래 예시</div>
+    <p><strong>상황:</strong> 서연이(현금 5,000원)가 도윤이 회사 주식(주가 1,500원)을 2주 매수</p>
+    <ul>
+      <li>비용: 1,500원 × 2주 = <strong>3,000원</strong></li>
+      <li>서연이 남은 현금: 5,000 - 3,000 = <strong>2,000원</strong></li>
+      <li>서연이는 "깔끔 주식회사" 주식 2주를 갖게 됩니다!</li>
+    </ul>
+    <p style="margin-top:10px;"><strong>그 후:</strong> 도윤이 주가가 2,000원으로 오르면?</p>
+    <ul>
+      <li>서연이 주식 가치: 2,000원 × 2주 = <strong>4,000원</strong></li>
+      <li>1,000원 이익! (3,000원에 샀는데 4,000원이 됨)</li>
+    </ul>
+  </div>
+
+
+  <!-- ==================== STEP 5 ==================== -->
+  <h2><span class="num">5</span> 순위표 보는 법</h2>
+
+  <p>순위표 탭에서 두 가지 순위를 볼 수 있어요.</p>
+
+  <div class="step-card">
+    <div class="step-title">📈 주가 순위</div>
+    <p>순수하게 <strong>내 회사의 주가</strong>만으로 순위를 매깁니다. CEO로서 얼마나 열심히 활동했는지를 보여줍니다.</p>
+  </div>
+
+  <div class="step-card">
+    <div class="step-title">💰 총자산 순위</div>
+    <p><strong>보유 현금 + 가지고 있는 주식의 현재 가치</strong>를 합한 순위입니다. 투자를 잘했는지도 포함됩니다!</p>
+    <p style="font-size:14px; color:#64748b;">총자산 = 현금 + (보유 주식 수 × 해당 회사 현재 주가)</p>
+  </div>
+
+
+  <!-- ==================== STEP 6 ==================== -->
+  <h2><span class="num">6</span> 한 주의 흐름</h2>
+
+  <div class="flow">
+    <div class="flow-item">📋 미션 확인</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-item">⭐ 활동하기</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-item">🗳️ 친구 평가</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-item">📊 정산</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-item">💰 수입 지급</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-item">📈 주식 거래</div>
+  </div>
+
+  <div class="step-card">
+    <div class="step-title">주간 흐름 자세히 보기</div>
+    <table>
+      <tr><th>순서</th><th>내용</th><th>설명</th></tr>
+      <tr><td>1</td><td>📋 주간 미션 확인</td><td>이번 주 어떤 미션인지 확인합니다.</td></tr>
+      <tr><td>2</td><td>⭐ 한 주 동안 활동</td><td>미션 수행, 수업 참여, 행운권 획득 등</td></tr>
+      <tr><td>3</td><td>🗳️ 친구 평가</td><td>친구들의 활동을 투표로 평가합니다.</td></tr>
+      <tr><td>4</td><td>📊 주차 정산</td><td>포인트+미션+투표 → 주가에 반영</td></tr>
+      <tr><td>5</td><td>💰 수입 지급</td><td>CEO 급여 + 사업 수익이 현금에 추가</td></tr>
+      <tr><td>6</td><td>📈 주식 거래</td><td>현금으로 친구 회사 주식 사고팔기</td></tr>
+    </table>
+  </div>
+
+
+  <!-- ==================== STEP 7 ==================== -->
+  <h2><span class="num">7</span> 경매</h2>
+
+  <p>가끔 특별한 상품이 경매에 나옵니다. 보유 현금으로 입찰할 수 있어요!</p>
+
+  <div class="step-card">
+    <div class="step-title">🔨 경매 방법</div>
+    <ol>
+      <li>선생님이 경매 상품과 시작 가격을 발표합니다.</li>
+      <li>사고 싶은 사람이 현재 가격보다 높은 금액을 부릅니다.</li>
+      <li>더 이상 높은 금액을 부르는 사람이 없으면 낙찰!</li>
+      <li>낙찰자의 현금에서 해당 금액이 빠져나갑니다.</li>
+    </ol>
+  </div>
+
+  <div class="step-card warning">
+    <div class="step-title">⚠️ 경매 주의사항</div>
+    <ul>
+      <li>보유 현금보다 높은 금액은 부를 수 없어요.</li>
+      <li>한번 부른 금액은 취소할 수 없어요. 신중하게!</li>
+    </ul>
+  </div>
+
+
+  <!-- ==================== STEP 8 ==================== -->
+  <h2><span class="num">8</span> 성공하는 CEO 전략</h2>
+
+  <div class="tip-box">
+    <div class="tip-title">🌟 주가를 올리려면</div>
+    <ul>
+      <li>주간 미션을 <strong>S등급</strong>으로 완수하세요. (+500은 가장 큰 주가 상승!)</li>
+      <li>수업 시간에 적극적으로 참여해서 <strong>선생님 포인트</strong>를 받으세요.</li>
+      <li>친구들에게 좋은 영향을 주면 <strong>친구 평가</strong> 득표도 올라요.</li>
+    </ul>
+  </div>
+
+  <div class="tip-box">
+    <div class="tip-title">💰 부자가 되려면</div>
+    <ul>
+      <li>주가가 오를 것 같은 친구의 주식을 미리 사두세요.</li>
+      <li>주가가 충분히 오르면 팔아서 차익을 얻으세요.</li>
+      <li>행운권은 <strong>가상 화폐</strong>로 전환하면 투자에 쓸 수 있어요.</li>
+      <li>경매에서 무리하게 입찰하면 현금이 부족해질 수 있으니 주의!</li>
+    </ul>
+  </div>
+
+  <div class="tip-box">
+    <div class="tip-title">⚠️ 이것만은 주의하세요</div>
+    <ul>
+      <li>현금을 다 써버리면 좋은 투자 기회가 와도 살 수 없어요.</li>
+      <li>한 회사에만 몰빵하면 위험해요. 여러 회사에 분산 투자!</li>
+      <li>주가가 떨어지는 회사 주식은 과감히 정리하세요.</li>
+    </ul>
+  </div>
+
+
+  <!-- ==================== 용어 정리 ==================== -->
+  <h2><span class="num">📖</span> 용어 정리</h2>
+
+  <table>
+    <tr><th>용어</th><th>뜻</th></tr>
+    <tr><td><span class="term">주가</span></td><td>내 회사의 가치를 나타내는 가격</td></tr>
+    <tr><td><span class="term">현금</span></td><td>내가 가진 돈. 주식을 사거나 경매에 사용</td></tr>
+    <tr><td><span class="term">총자산</span></td><td>현금 + 보유 주식의 현재 가치를 합한 금액</td></tr>
+    <tr><td><span class="term">매수</span></td><td>주식을 사는 것 (현금이 줄어듦)</td></tr>
+    <tr><td><span class="term">매도</span></td><td>주식을 파는 것 (현금이 늘어남)</td></tr>
+    <tr><td><span class="term">정산</span></td><td>한 주의 활동을 정리해 주가와 수입에 반영하는 것</td></tr>
+    <tr><td><span class="term">CEO 급여</span></td><td>매주 정산 후 주가의 10%를 현금으로 받는 것</td></tr>
+    <tr><td><span class="term">사업 수익</span></td><td>미션 등급에 따라 받는 추가 현금</td></tr>
+    <tr><td><span class="term">행운권</span></td><td>특별 활동으로 받는 보상 (1장 = 100원)</td></tr>
+    <tr><td><span class="term">포트폴리오</span></td><td>내가 보유한 주식 목록</td></tr>
+  </table>
+
+
+  <!-- 푸터 -->
+  <div class="footer">
+    🏢 4-2 주식회사 학생 매뉴얼
+  </div>
+
+</div>
+
+</body>
+</html>
