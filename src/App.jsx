@@ -49,27 +49,32 @@ export default function App() {
 
   const save = useCallback(async (s, t, w, m, e, tl) => {
     try {
-      await setDoc(doc(db, "classroom", "students"), { data: JSON.stringify(s) });
-      await setDoc(doc(db, "classroom", "txs"), { data: JSON.stringify(t) });
-      await setDoc(doc(db, "classroom", "meta"), { w, m });
-      await setDoc(doc(db, "classroom", "evts"), { data: JSON.stringify(e) });
-      if (tl !== undefined) await setDoc(doc(db, "classroom", "tickets"), { data: JSON.stringify(tl) });
+      const ops = [
+        setDoc(doc(db, "classroom", "students"), { data: JSON.stringify(s) }),
+        setDoc(doc(db, "classroom", "txs"), { data: JSON.stringify(t) }),
+        setDoc(doc(db, "classroom", "meta"), { w, m }),
+        setDoc(doc(db, "classroom", "evts"), { data: JSON.stringify(e) }),
+      ];
+      if (tl !== undefined) ops.push(setDoc(doc(db, "classroom", "tickets"), { data: JSON.stringify(tl) }));
+      await Promise.all(ops);
     } catch (err) { console.error("Firestore save error:", err); }
   }, []);
 
   useEffect(() => {
     (async () => {
       try {
-        const snap = await getDoc(doc(db, "classroom", "students"));
+        const [snap, tSnap, mSnap, eSnap, tlSnap] = await Promise.all([
+          getDoc(doc(db, "classroom", "students")),
+          getDoc(doc(db, "classroom", "txs")),
+          getDoc(doc(db, "classroom", "meta")),
+          getDoc(doc(db, "classroom", "evts")),
+          getDoc(doc(db, "classroom", "tickets")),
+        ]);
         if (snap.exists()) {
           setStudents(JSON.parse(snap.data().data));
-          const tSnap = await getDoc(doc(db, "classroom", "txs"));
           setTxs(tSnap.exists() ? JSON.parse(tSnap.data().data) : []);
-          const mSnap = await getDoc(doc(db, "classroom", "meta"));
           if (mSnap.exists()) { const d = mSnap.data(); setWeek(d.w || 1); setMission(d.m || ""); }
-          const eSnap = await getDoc(doc(db, "classroom", "evts"));
           setEvts(eSnap.exists() ? JSON.parse(eSnap.data().data) : []);
-          const tlSnap = await getDoc(doc(db, "classroom", "tickets"));
           setTicketLog(tlSnap.exists() ? JSON.parse(tlSnap.data().data) : []);
         } else { initEmpty(); }
       } catch (err) { console.error("Firestore load error:", err); initEmpty(); }
