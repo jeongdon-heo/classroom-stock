@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, AreaChart, Area, BarChart, Bar, CartesianGrid } from "recharts";
 import { TrendingUp, TrendingDown, Users, Award, Settings, BarChart3, ArrowUpRight, ArrowDownRight, ShoppingCart, DollarSign, Star, Zap, Trophy, Plus, Minus, ChevronRight, X, Check, AlertTriangle, Sparkles, Building2, PiggyBank, Megaphone, Vote, Target, Gift, RefreshCw, Trash2, Edit3, Save, Crown, Medal, GraduationCap, Printer, FileText } from "lucide-react";
 import { db } from "./firebase";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, getDocFromCache, getDocFromServer, setDoc } from "firebase/firestore";
 
 const SAMPLE_STUDENTS = [
   { id: 1, name: "김도윤", company: "깔끔 주식회사", slogan: "교실 정리의 달인!", emoji: "🧹" },
@@ -60,24 +60,36 @@ export default function App() {
     } catch (err) { console.error("Firestore save error:", err); }
   }, []);
 
+  function applySnaps(snap, tSnap, mSnap, eSnap, tlSnap) {
+    if (snap.exists()) {
+      setStudents(JSON.parse(snap.data().data));
+      setTxs(tSnap.exists() ? JSON.parse(tSnap.data().data) : []);
+      if (mSnap.exists()) { const d = mSnap.data(); setWeek(d.w || 1); setMission(d.m || ""); }
+      setEvts(eSnap.exists() ? JSON.parse(eSnap.data().data) : []);
+      setTicketLog(tlSnap.exists() ? JSON.parse(tlSnap.data().data) : []);
+      return true;
+    }
+    return false;
+  }
+
   useEffect(() => {
+    const docs = ["students", "txs", "meta", "evts", "tickets"].map(k => doc(db, "classroom", k));
     (async () => {
+      let cacheHit = false;
+      // 1) 캐시에서 즉시 로드 시도
       try {
-        const [snap, tSnap, mSnap, eSnap, tlSnap] = await Promise.all([
-          getDoc(doc(db, "classroom", "students")),
-          getDoc(doc(db, "classroom", "txs")),
-          getDoc(doc(db, "classroom", "meta")),
-          getDoc(doc(db, "classroom", "evts")),
-          getDoc(doc(db, "classroom", "tickets")),
-        ]);
-        if (snap.exists()) {
-          setStudents(JSON.parse(snap.data().data));
-          setTxs(tSnap.exists() ? JSON.parse(tSnap.data().data) : []);
-          if (mSnap.exists()) { const d = mSnap.data(); setWeek(d.w || 1); setMission(d.m || ""); }
-          setEvts(eSnap.exists() ? JSON.parse(eSnap.data().data) : []);
-          setTicketLog(tlSnap.exists() ? JSON.parse(tlSnap.data().data) : []);
-        } else { initEmpty(); }
-      } catch (err) { console.error("Firestore load error:", err); initEmpty(); }
+        const cached = await Promise.all(docs.map(d => getDocFromCache(d)));
+        cacheHit = applySnaps(...cached);
+        if (cacheHit) setLoading(false);
+      } catch (_) { /* 캐시 없음 - 무시 */ }
+      // 2) 서버에서 최신 데이터 동기화
+      try {
+        const server = await Promise.all(docs.map(d => getDocFromServer(d)));
+        if (!applySnaps(...server) && !cacheHit) initEmpty();
+      } catch (err) {
+        console.error("Firestore load error:", err);
+        if (!cacheHit) initEmpty();
+      }
       setLoading(false);
     })();
   }, []);
