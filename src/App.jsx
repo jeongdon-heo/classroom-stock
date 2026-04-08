@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, createContext, useContext } from "react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, AreaChart, Area, BarChart, Bar, CartesianGrid } from "recharts";
 import { TrendingUp, TrendingDown, Users, Award, Settings, BarChart3, ArrowUpRight, ArrowDownRight, ShoppingCart, DollarSign, Star, Zap, Trophy, Plus, Minus, ChevronRight, X, Check, AlertTriangle, Sparkles, Building2, PiggyBank, Megaphone, Vote, Target, Gift, RefreshCw, Trash2, Edit3, Save, Crown, Medal, GraduationCap, Printer, FileText } from "lucide-react";
 import { db } from "./firebase";
@@ -31,6 +31,9 @@ const TICKET_REASONS = [
   { id: "mission4", label: "돌발미션 (최고난도)", tickets: 5, emoji: "🌟" },
   { id: "custom", label: "기타 (직접 입력)", tickets: 0, emoji: "🎫" },
 ];
+
+const AppContext = createContext();
+function useApp() { return useContext(AppContext); }
 
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
 
@@ -81,7 +84,7 @@ export default function App() {
         const cached = await Promise.all(docs.map(d => getDocFromCache(d)));
         cacheHit = applySnaps(...cached);
         if (cacheHit) setLoading(false);
-      } catch (_) { /* 캐시 없음 - 무시 */ }
+      } catch (e) { console.debug("Cache miss:", e.message); }
       // 2) 서버에서 최신 데이터 동기화
       try {
         const server = await Promise.all(docs.map(d => getDocFromServer(d)));
@@ -109,7 +112,7 @@ export default function App() {
       ...s, stockPrice: DEFAULT_STOCK_PRICE,
       history: [{ week: 0, price: DEFAULT_STOCK_PRICE, label: "시작" }],
       cash: DEFAULT_CASH, portfolio: [],
-      tp: 0, mg: "", pv: 0,
+      tp: 0, mg: "", pv: 0, lastSalary: 0, lastBiz: 0,
     }));
     setStudents(init);
     setTxs([]);
@@ -127,7 +130,7 @@ export default function App() {
 
   const saveTickets = useCallback((tl) => {
     setTicketLog(tl);
-    try { setDoc(doc(db, "classroom", "tickets"), { data: JSON.stringify(tl) }); } catch {}
+    setDoc(doc(db, "classroom", "tickets"), { data: JSON.stringify(tl) }).catch(err => console.error("Ticket save error:", err));
   }, []);
 
   function portfolioVal(port, studs) {
@@ -214,7 +217,17 @@ export default function App() {
     { id: "admin", label: "관리자", icon: <Settings size={18} /> },
   ];
 
+  const ctx = {
+    students, setStudents: s => persist(s, txs, week, mission, evts),
+    txs, week, mission, setMission: m => persist(students, txs, week, m, evts),
+    evts, setEvts: e => persist(students, txs, week, mission, e),
+    persist, portfolioVal, doTrade, settle, resetAll, loadSample,
+    showAdd, setShowAdd, showReport, setShowReport,
+    ticketLog, saveTickets, selStudent, setSelStudent,
+  };
+
   return (
+    <AppContext.Provider value={ctx}>
     <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #0a0e1a 0%, #121832 50%, #0d1525 100%)", color: "#e8eaf6", fontFamily: "'Noto Sans KR', -apple-system, sans-serif" }}>
       <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=Black+Han+Sans&display=swap" rel="stylesheet" />
 
@@ -240,14 +253,15 @@ export default function App() {
       </nav>
 
       <main style={{ padding: "20px", maxWidth: 1100, margin: "0 auto" }}>
-        {tab === "dashboard" && <Dashboard students={students} txs={txs} week={week} onSel={setSelStudent} portfolioVal={portfolioVal} />}
-        {tab === "trade" && <Trade students={students} doTrade={doTrade} txs={txs} />}
-        {tab === "ranking" && <Ranking students={students} portfolioVal={portfolioVal} />}
-        {tab === "admin" && <Admin students={students} setStudents={s => persist(s, txs, week, mission, evts)} week={week} mission={mission} setMission={m => persist(students, txs, week, m, evts)} evts={evts} setEvts={e => persist(students, txs, week, mission, e)} settle={settle} resetAll={resetAll} loadSample={loadSample} showAdd={showAdd} setShowAdd={setShowAdd} persist={persist} txs={txs} showReport={showReport} setShowReport={setShowReport} portfolioVal={portfolioVal} ticketLog={ticketLog} saveTickets={saveTickets} />}
+        {tab === "dashboard" && <Dashboard />}
+        {tab === "trade" && <Trade />}
+        {tab === "ranking" && <Ranking />}
+        {tab === "admin" && <Admin />}
       </main>
 
-      {selStudent && <Modal onClose={() => setSelStudent(null)}><Detail s={students.find(x => x.id === selStudent)} students={students} txs={txs} portfolioVal={portfolioVal} /></Modal>}
+      {selStudent && <Modal onClose={() => setSelStudent(null)}><Detail s={students.find(x => x.id === selStudent)} /></Modal>}
     </div>
+    </AppContext.Provider>
   );
 }
 
@@ -285,7 +299,8 @@ function Stat({ icon, label, value, color }) {
 }
 
 // ─── DASHBOARD ───
-function Dashboard({ students, txs, week, onSel, portfolioVal }) {
+function Dashboard() {
+  const { students, txs, week, setSelStudent: onSel, portfolioVal } = useApp();
   const sorted = [...students].sort((a, b) => b.stockPrice - a.stockPrice);
   const avg = Math.round(students.reduce((s, x) => s + x.stockPrice, 0) / (students.length || 1));
   const colors = ["#7c9eff", "#b388ff", "#80cbc4", "#ffab40", "#ff8a80", "#a5d6a7", "#f48fb1", "#81d4fa", "#ffe082", "#ce93d8"];
@@ -359,7 +374,8 @@ function Dashboard({ students, txs, week, onSel, portfolioVal }) {
 }
 
 // ─── DETAIL ───
-function Detail({ s, students, txs, portfolioVal }) {
+function Detail({ s }) {
+  const { students, txs, portfolioVal } = useApp();
   if (!s) return null;
   const h = s.history;
   const prev = h.length > 1 ? h[h.length - 2].price : h[0].price;
@@ -445,7 +461,8 @@ function Detail({ s, students, txs, portfolioVal }) {
 const ss = { display: "block", fontSize: 12, color: "#778", marginBottom: 4, marginTop: 10 };
 const si = { width: "100%", padding: "10px 12px", background: "rgba(100,130,255,0.05)", border: "1px solid rgba(120,140,255,0.15)", borderRadius: 10, color: "#e0e6ff", fontSize: 13, outline: "none", boxSizing: "border-box" };
 
-function Trade({ students, doTrade, txs }) {
+function Trade() {
+  const { students, doTrade, txs } = useApp();
   const [buyer, setBuyer] = useState("");
   const [co, setCo] = useState("");
   const [sh, setSh] = useState(1);
@@ -537,7 +554,8 @@ function Trade({ students, doTrade, txs }) {
 const qb = { background: "rgba(100,130,255,0.1)", border: "1px solid rgba(120,140,255,0.2)", borderRadius: 8, color: "#9cb8ff", cursor: "pointer", width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center" };
 
 // ─── RANKING ───
-function Ranking({ students, portfolioVal }) {
+function Ranking() {
+  const { students, portfolioVal } = useApp();
   const [mode, setMode] = useState("stock");
   const getVal = (s) => mode === "stock" ? s.stockPrice : s.cash + portfolioVal(s.portfolio, students);
   const sorted = [...students].sort((a, b) => getVal(b) - getVal(a));
@@ -600,7 +618,8 @@ function Ranking({ students, portfolioVal }) {
 // ─── ADMIN ───
 const sb = { padding: "4px 10px", background: "rgba(100,130,255,0.06)", border: "1px solid rgba(120,140,255,0.1)", borderRadius: 6, cursor: "pointer", fontSize: 12, fontWeight: 600 };
 
-function Admin({ students, setStudents, week, mission, setMission, evts, setEvts, settle, resetAll, loadSample, showAdd, setShowAdd, persist, txs, showReport, setShowReport, portfolioVal, ticketLog, saveTickets }) {
+function Admin() {
+  const { students, setStudents, week, mission, setMission, evts, setEvts, settle, resetAll, loadSample, showAdd, setShowAdd, persist, txs, showReport, setShowReport, portfolioVal, ticketLog, saveTickets } = useApp();
   const [sub, setSub] = useState("ticket");
   const [nm, setNm] = useState(mission);
   const [ed, setEd] = useState("");
@@ -654,8 +673,9 @@ function Admin({ students, setStudents, week, mission, setMission, evts, setEvts
   };
 
   const addS = () => {
-    if (!nn || !nc) return;
-    setStudents([...students, { id: Date.now(), name: nn, company: nc, slogan: ns || "열심히!", emoji: ne, stockPrice: 1000, history: [{ week: Math.max(0, week - 1), price: 1000, label: "시작" }], cash: 10000, portfolio: [], tp: 0, mg: "", pv: 0 }]);
+    if (!nn.trim() || !nc.trim()) return;
+    if (nn.trim().length > 20 || nc.trim().length > 30 || ns.length > 50) return;
+    setStudents([...students, { id: Date.now(), name: nn, company: nc, slogan: ns || "열심히!", emoji: ne, stockPrice: DEFAULT_STOCK_PRICE, history: [{ week: Math.max(0, week - 1), price: DEFAULT_STOCK_PRICE, label: "시작" }], cash: DEFAULT_CASH, portfolio: [], tp: 0, mg: "", pv: 0, lastSalary: 0, lastBiz: 0 }]);
     setNn(""); setNc(""); setNs(""); setNe("🏢"); setShowAdd(false);
   };
   const upPts = (id, a) => setStudents(students.map(s => s.id === id ? { ...s, tp: (s.tp || 0) + a } : s));
@@ -933,14 +953,14 @@ function Admin({ students, setStudents, week, mission, setMission, evts, setEvts
                 <div style={{ display: "flex", gap: 8 }}>
                   <button onClick={() => { setShowBulk(false); setBulkText(""); }} style={{ padding: "8px 16px", background: "rgba(100,130,255,0.05)", border: "1px solid rgba(120,140,255,0.1)", borderRadius: 8, color: "#778", cursor: "pointer", fontSize: 13 }}>취소</button>
                   <button onClick={() => {
-                    const names = bulkText.trim().split("\n").map(l => l.trim()).filter(l => l);
+                    const names = bulkText.trim().split("\n").map(l => l.trim()).filter(l => l && l.length <= 20);
                     if (names.length === 0) return;
                     const emojis = ["🏢","💡","🔢","📚","⚽","🎨","🔬","💖","🌟","🎯","🚀","🎪","🌈","🎸","🏆","🌻","🐬","🦁","🎭","🍀","🔥","⭐","🎵","🌍","🦋","🎈","🏅","💎","🎮","🌺"];
                     const newStudents = names.map((name, i) => ({
                       id: Date.now() + i, name, company: `${name} 주식회사`, slogan: "열심히 하는 회사!",
                       emoji: emojis[i % emojis.length], stockPrice: DEFAULT_STOCK_PRICE,
                       history: [{ week: Math.max(0, week - 1), price: DEFAULT_STOCK_PRICE, label: "시작" }],
-                      cash: DEFAULT_CASH, portfolio: [], tp: 0, mg: "", pv: 0,
+                      cash: DEFAULT_CASH, portfolio: [], tp: 0, mg: "", pv: 0, lastSalary: 0, lastBiz: 0,
                     }));
                     setStudents([...students, ...newStudents]);
                     setBulkText(""); setShowBulk(false);
@@ -957,12 +977,12 @@ function Admin({ students, setStudents, week, mission, setMission, evts, setEvts
             <div style={{ background: "rgba(100,130,255,0.05)", borderRadius: 12, padding: 16, marginBottom: 16, border: "1px solid rgba(120,140,255,0.1)" }}>
               <h4 style={{ margin: "0 0 12px", fontSize: 14, color: "#e0e6ff" }}>새 학생</h4>
               <div style={{ display: "grid", gridTemplateColumns: "60px 1fr 1fr", gap: 8, marginBottom: 8 }}>
-                <div><label style={ss}>이모지</label><input value={ne} onChange={e => setNe(e.target.value)} style={{ ...si, textAlign: "center", fontSize: 20, padding: 6 }} /></div>
-                <div><label style={ss}>이름</label><input value={nn} onChange={e => setNn(e.target.value)} placeholder="홍길동" style={si} /></div>
-                <div><label style={ss}>회사명</label><input value={nc} onChange={e => setNc(e.target.value)} placeholder="미래 주식회사" style={si} /></div>
+                <div><label style={ss}>이모지</label><input value={ne} onChange={e => setNe(e.target.value)} maxLength={4} style={{ ...si, textAlign: "center", fontSize: 20, padding: 6 }} /></div>
+                <div><label style={ss}>이름</label><input value={nn} onChange={e => setNn(e.target.value)} maxLength={20} placeholder="홍길동" style={si} /></div>
+                <div><label style={ss}>회사명</label><input value={nc} onChange={e => setNc(e.target.value)} maxLength={30} placeholder="미래 주식회사" style={si} /></div>
               </div>
               <label style={ss}>슬로건</label>
-              <input value={ns} onChange={e => setNs(e.target.value)} placeholder="우리 회사는 ○○을 잘합니다!" style={{ ...si, marginBottom: 10 }} />
+              <input value={ns} onChange={e => setNs(e.target.value)} maxLength={50} placeholder="우리 회사는 ○○을 잘합니다!" style={{ ...si, marginBottom: 10 }} />
               <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
                 <button onClick={() => setShowAdd(false)} style={{ padding: "8px 16px", background: "rgba(100,130,255,0.05)", border: "1px solid rgba(120,140,255,0.1)", borderRadius: 8, color: "#778", cursor: "pointer", fontSize: 13 }}>취소</button>
                 <button onClick={addS} style={{ padding: "8px 16px", background: "linear-gradient(135deg, #1565c0, #1976d2)", border: "none", borderRadius: 8, color: "#fff", cursor: "pointer", fontSize: 13, fontWeight: 600 }}>등록</button>
@@ -976,14 +996,14 @@ function Admin({ students, setStudents, week, mission, setMission, evts, setEvts
             {students.map(s => (
               <div key={s.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", background: "rgba(100,130,255,0.04)", borderRadius: 10, border: "1px solid rgba(120,140,255,0.06)" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 6, flex: 1 }}>
-                  <input value={s.emoji} onChange={e => setStudents(students.map(x => x.id === s.id ? { ...x, emoji: e.target.value } : x))} style={{ width: 36, fontSize: 20, background: "transparent", border: "1px solid transparent", borderRadius: 6, textAlign: "center", cursor: "pointer", padding: 2, color: "#fff" }} onFocus={e => e.target.style.borderColor = "rgba(120,160,255,0.3)"} onBlur={e => e.target.style.borderColor = "transparent"} />
+                  <input value={s.emoji} onChange={e => setStudents(students.map(x => x.id === s.id ? { ...x, emoji: e.target.value } : x))} maxLength={4} style={{ width: 36, fontSize: 20, background: "transparent", border: "1px solid transparent", borderRadius: 6, textAlign: "center", cursor: "pointer", padding: 2, color: "#fff" }} onFocus={e => e.target.style.borderColor = "rgba(120,160,255,0.3)"} onBlur={e => e.target.style.borderColor = "transparent"} />
                   <div style={{ flex: 1 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
                       <span style={{ fontWeight: 600, fontSize: 13, color: "#ccd" }}>{s.name}</span>
                       <span style={{ color: "#556", fontSize: 12 }}>—</span>
-                      <input value={s.company} onChange={e => setStudents(students.map(x => x.id === s.id ? { ...x, company: e.target.value } : x))} style={{ background: "transparent", border: "1px solid transparent", borderRadius: 4, color: "#9cb8ff", fontSize: 13, fontWeight: 600, padding: "1px 4px", flex: 1, maxWidth: 200 }} onFocus={e => e.target.style.borderColor = "rgba(120,160,255,0.3)"} onBlur={e => e.target.style.borderColor = "transparent"} />
+                      <input value={s.company} onChange={e => setStudents(students.map(x => x.id === s.id ? { ...x, company: e.target.value } : x))} maxLength={30} style={{ background: "transparent", border: "1px solid transparent", borderRadius: 4, color: "#9cb8ff", fontSize: 13, fontWeight: 600, padding: "1px 4px", flex: 1, maxWidth: 200 }} onFocus={e => e.target.style.borderColor = "rgba(120,160,255,0.3)"} onBlur={e => e.target.style.borderColor = "transparent"} />
                     </div>
-                    <input value={s.slogan} onChange={e => setStudents(students.map(x => x.id === s.id ? { ...x, slogan: e.target.value } : x))} style={{ background: "transparent", border: "1px solid transparent", borderRadius: 4, color: "#556", fontSize: 11, padding: "1px 4px", width: "100%", maxWidth: 300 }} onFocus={e => e.target.style.borderColor = "rgba(120,160,255,0.3)"} onBlur={e => e.target.style.borderColor = "transparent"} placeholder="슬로건 입력..." />
+                    <input value={s.slogan} onChange={e => setStudents(students.map(x => x.id === s.id ? { ...x, slogan: e.target.value } : x))} maxLength={50} style={{ background: "transparent", border: "1px solid transparent", borderRadius: 4, color: "#556", fontSize: 11, padding: "1px 4px", width: "100%", maxWidth: 300 }} onFocus={e => e.target.style.borderColor = "rgba(120,160,255,0.3)"} onBlur={e => e.target.style.borderColor = "transparent"} placeholder="슬로건 입력..." />
                   </div>
                 </div>
                 <button onClick={() => { if (confirm(`${s.name} 삭제?`)) setStudents(students.filter(x => x.id !== s.id)); }} style={{ background: "rgba(255,107,122,0.1)", border: "1px solid rgba(255,107,122,0.15)", borderRadius: 6, color: "#ff6b7a", cursor: "pointer", padding: "4px 8px" }}><Trash2 size={14} /></button>
@@ -1228,13 +1248,14 @@ function Admin({ students, setStudents, week, mission, setMission, evts, setEvts
       )}
 
       {/* 보고서 인쇄 오버레이 */}
-      {showReport && <ReportOverlay students={students} week={week} portfolioVal={portfolioVal} txs={txs} onClose={() => setShowReport(false)} />}
+      {showReport && <ReportOverlay onClose={() => setShowReport(false)} />}
     </div>
   );
 }
 
 // ─── REPORT OVERLAY ───
-function ReportOverlay({ students, week, portfolioVal, txs, onClose }) {
+function ReportOverlay({ onClose }) {
+  const { students, week, portfolioVal, txs } = useApp();
   const reportWeek = Math.max(1, week - 1);
   const sorted = [...students].sort((a, b) => b.stockPrice - a.stockPrice);
   const today = new Date().toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric" });

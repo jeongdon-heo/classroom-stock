@@ -11,6 +11,13 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
+if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
+  console.error(
+    "Firebase 환경변수가 설정되지 않았습니다.\n" +
+    ".env.example 파일을 참고하여 .env.local 파일을 생성하세요."
+  );
+}
+
 const app = initializeApp(firebaseConfig);
 export const db = initializeFirestore(app, {
   localCache: persistentLocalCache({ tabManager: persistentSingleTabManager() })

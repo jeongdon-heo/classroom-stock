@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>나의 기업 설계서 - 예시 모음</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=Black+Han+Sans&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: linear-gradient(135deg, #0a0e1a 0%, #121832 50%, #0d1525 100%);
+      color: #e8eaf6;
+      font-family: 'Noto Sans KR', sans-serif;
+      min-height: 100vh;
+      padding: 30px 20px 60px;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+    .header h1 {
+      font-family: 'Black Han Sans', sans-serif;
+      font-size: 36px;
+      background: linear-gradient(90deg, #7c9eff, #b388ff, #82b1ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+    .header p {
+      font-size: 15px;
+      color: #778;
+      line-height: 1.7;
+    }
+    .header .badge {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 6px 18px;
+      background: rgba(100,255,150,0.08);
+      border: 1px solid rgba(100,255,150,0.15);
+      border-radius: 20px;
+      font-size: 13px;
+      color: #80ffaa;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .card {
+      background: linear-gradient(160deg, rgba(25,35,70,0.8), rgba(20,28,55,0.9));
+      border: 1px solid rgba(120,140,255,0.1);
+      border-radius: 16px;
+      padding: 22px;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .card:hover {
+      border-color: rgba(120,160,255,0.3);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(100,130,255,0.1);
+    }
+    .card .num {
+      position: absolute;
+      top: 10px;
+      right: 14px;
+      font-size: 11px;
+      color: #556;
+      font-weight: 600;
+    }
+    .card .emoji {
+      font-size: 44px;
+      margin-bottom: 12px;
+      display: block;
+    }
+    .card .company {
+      font-size: 18px;
+      font-weight: 800;
+      color: #e0e6ff;
+      margin-bottom: 4px;
+    }
+    .card .ceo {
+      font-size: 13px;
+      color: #9cb8ff;
+      margin-bottom: 10px;
+    }
+    .card .slogan {
+      font-size: 13px;
+      color: #b0b8d0;
+      background: rgba(100,130,255,0.06);
+      padding: 8px 12px;
+      border-radius: 8px;
+      border-left: 3px solid rgba(124,158,255,0.3);
+      font-style: italic;
+      line-height: 1.5;
+    }
+    .card .tag {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .tip-box {
+      max-width: 1200px;
+      margin: 36px auto 0;
+      background: rgba(255,171,64,0.06);
+      border: 1px solid rgba(255,171,64,0.15);
+      border-radius: 14px;
+      padding: 24px 28px;
+    }
+    .tip-box h3 {
+      font-size: 16px;
+      color: #ffab40;
+      margin-bottom: 12px;
+    }
+    .tip-box ul {
+      list-style: none;
+      padding: 0;
+    }
+    .tip-box li {
+      font-size: 14px;
+      color: #b0b8d0;
+      padding: 6px 0;
+      padding-left: 20px;
+      position: relative;
+      line-height: 1.6;
+    }
+    .tip-box li::before {
+      content: ">";
+      position: absolute;
+      left: 0;
+      color: #ffab40;
+      font-weight: 700;
+    }
+    .print-btn {
+      display: block;
+      margin: 30px auto 0;
+      padding: 14px 36px;
+      background: linear-gradient(135deg, #1565c0, #1976d2);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'Noto Sans KR', sans-serif;
+    }
+    .print-btn:hover { opacity: 0.9; }
+    @media print {
+      body { background: #fff; color: #222; padding: 10px; }
+      .card { border: 1px solid #ddd; background: #f8f9ff; }
+      .card .company { color: #1a237e; }
+      .card .ceo { color: #2E75B6; }
+      .card .slogan { color: #444; background: #f0f3ff; border-left-color: #2E75B6; }
+      .card .num { color: #999; }
+      .header h1 { background: none; -webkit-text-fill-color: #1a237e; }
+      .header p, .tip-box li { color: #555; }
+      .tip-box { border-color: #ddd; background: #fffbf0; }
+      .tip-box h3 { color: #e65100; }
+      .print-btn { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>나의 기업 설계서</h1>
+    <p>나만의 1인 회사를 만들어 보세요! 아래 예시를 참고해서<br>나의 장점과 꿈을 담은 멋진 회사를 설계해 봅시다.</p>
+    <div class="badge">4학년 2반 주식회사 | 기업 설계 가이드</div>
+  </div>
+
+  <div class="grid">
+
+    <div class="card">
+      <span class="num">#1</span>
+      <span class="emoji">🧹</span>
+      <div class="company">깔끔 주식회사</div>
+      <div class="ceo">CEO 김도윤</div>
+      <div class="slogan">"교실 정리의 달인! 깨끗한 교실, 기분 좋은 하루의 시작!"</div>
+      <span class="tag" style="background:rgba(76,223,139,0.12);color:#4cdf8b;">정리정돈</span>
+    </div>
+
+    <div class="card">
+      <span class="num">#2</span>
+      <span class="emoji">💡</span>
+      <div class="company">아이디어 랩</div>
+      <div class="ceo">CEO 이서연</div>
+      <div class="slogan">"창의력이 폭발하는 회사! 남들과 다른 생각이 우리의 무기!"</div>
+      <span class="tag" style="background:rgba(255,171,64,0.12);color:#ffab40;">창의력</span>
+    </div>
+
+    <div class="card">
+      <span class="num">#3</span>
+      <span class="emoji">🔢</span>
+      <div class="company">수학왕 컴퍼니</div>
+      <div class="ceo">CEO 박지호</div>
+      <div class="slogan">"어려운 문제도 척척! 수학의 재미를 알려드립니다."</div>
+      <span class="tag" style="background:rgba(124,158,255,0.12);color:#7c9eff;">수학</span>
+    </div>
+
+    <div class="card">
+      <span class="num">#4</span>
+      <span class="emoji">📚</span>
+      <div class="company">책벌레 기업</div>
+      <div class="ceo">CEO 최유나</div>
+      <div class="slogan">"독서로 세상을 바꾸자! 하루 한 권, 미래를 여는 열쇠."</div>
+      <span class="tag" style="background:rgba(179,136,255,0.12);color:#b388ff;">독서</span>
+    </div>
+
+    <div class="card">
+      <span class="num">#5</span>
+      <span class="emoji">⚽</span>
+      <div class="company">스포츠 히어로즈</div>
+      <div class="ceo">CEO 정민재</div>
+      <div class="slogan">"운동으로 건강한 몸과 마음! 체육 시간의 에이스!"</div>
+      <span class="tag" style="background:rgba(76,223,139,0.12);color:#4cdf8b;">체육</span>
+    </div>
+
+    <div class="card">
+      <span class="num">#6</span>
+      <span class="emoji">🎨</span>
+      <div class="company">예술의 전당</div>
+      <div class="ceo">CEO 한수빈</div>
+      <div class="slogan">"그림과 음악으로 세상을 아름답게! 예술가의 길을 걸어요."</div>
+      <span class="tag" style="background:rgba(244,143,177,0.12);color:#f48fb1;">예술</span>
+    </div>
+
+    <div class="card">
+      <span class="num">#7</span>
+      <span class="emoji">🔬</span>
+      <div class="company">과학 탐험대</div>
+      <div class="ceo">CEO 오태양</div>
+      <div class="slogan">"실험하고 발견하는 회사! 과학의 신비를 풀어봐요."</div>
+      <span class="tag" style="background:rgba(128,203,196,0.12);color:#80cbc4;">과학</span>
+    </div>
+
+    <div class="card">
+      <span class="num">#8</span>
+      <span class="emoji">💖</span>
+      <div class="company">친절 주식회사</div>
+      <div class="ceo">CEO 윤하은</div>
+      <div class="slogan">"따뜻한 말 한마디의 힘! 친구들의 마음을 밝히는 회사."</div>
+      <span class="tag" style="background:rgba(244,143,177,0.12);color:#f48fb1;">배려</span>
+    </div>
+
+    <div class="card">
+      <span class="num">#9</span>
+      <span class="emoji">🌍</span>
+      <div class="company">지구 지킴이</div>
+      <div class="ceo">CEO 송하린</div>
+      <div class="slogan">"환경을 생각하는 기업! 분리수거 1등, 지구의 영웅!"</div>
+      <span class="tag" style="background:rgba(76,223,139,0.12);color:#4cdf8b;">환경</span>
+    </div>
+
+    <div class="card">
+      <span class="num">#10</span>
+      <span class="emoji">🎵</span>
+      <div class="company">멜로디 하우스</div>
+      <div class="ceo">CEO 강시우</div>
+      <div class="slogan">"노래로 하나 되는 우리 반! 음악이 있으면 어디든 무대!"</div>
+      <span class="tag" style="background:rgba(255,171,64,0.12);color:#ffab40;">음악</span>
+    </div>
+
+    <div class="card">
+      <span class="num">#11</span>
+      <span class="emoji">🚀</span>
+      <div class="company">미래 로켓</div>
+      <div class="ceo">CEO 임준서</div>
+      <div class="slogan">"목표를 향해 로켓처럼! 도전을 두려워하지 않는 회사!"</div>
+      <span class="tag" style="background:rgba(124,158,255,0.12);color:#7c9eff;">도전</span>
+    </div>
+
+    <div class="card">
+      <span class="num">#12</span>
+      <span class="emoji">🐶</span>
+      <div class="company">동물 사랑 기업</div>
+      <div class="ceo">CEO 백서윤</div>
+      <div class="slogan">"모든 생명은 소중해요! 동물 돌봄의 전문가."</div>
+      <span class="tag" style="background:rgba(179,136,255,0.12);color:#b388ff;">동물</span>
+    </div>
+
+    <div class="card">
+      <span class="num">#13</span>
+      <span class="emoji">🍳</span>
+      <div class="company">맛있는 연구소</div>
+      <div class="ceo">CEO 조예린</div>
+      <div class="slogan">"요리는 과학이다! 맛있는 한 접시로 모두를 행복하게."</div>
+      <span class="tag" style="background:rgba(255,171,64,0.12);color:#ffab40;">요리</span>
+    </div>
+
+    <div class="card">
+      <span class="num">#14</span>
+      <span class="emoji">🏃</span>
+      <div class="company">끈기 컴퍼니</div>
+      <div class="ceo">CEO 남도현</div>
+      <div class="slogan">"포기란 없다! 끝까지 해내는 힘, 그게 우리의 자본!"</div>
+      <span class="tag" style="background:rgba(76,223,139,0.12);color:#4cdf8b;">끈기</span>
+    </div>
+
+    <div class="card">
+      <span class="num">#15</span>
+      <span class="emoji">🎮</span>
+      <div class="company">코딩 마스터즈</div>
+      <div class="ceo">CEO 황지안</div>
+      <div class="slogan">"코딩으로 게임을 만들자! 미래의 개발자가 여기 있어요."</div>
+      <span class="tag" style="background:rgba(128,203,196,0.12);color:#80cbc4;">코딩</span>
+    </div>
+
+    <div class="card">
+      <span class="num">#16</span>
+      <span class="emoji">🌻</span>
+      <div class="company">행복 가든</div>
+      <div class="ceo">CEO 문소율</div>
+      <div class="slogan">"웃음꽃이 피는 회사! 매일 긍정 에너지를 퍼뜨려요."</div>
+      <span class="tag" style="background:rgba(255,224,130,0.15);color:#ffe082;">긍정</span>
+    </div>
+
+    <div class="card">
+      <span class="num">#17</span>
+      <span class="emoji">📝</span>
+      <div class="company">글솜씨 주식회사</div>
+      <div class="ceo">CEO 유채원</div>
+      <div class="slogan">"글로 마음을 전해요! 일기, 편지, 시 뭐든 척척!"</div>
+      <span class="tag" style="background:rgba(179,136,255,0.12);color:#b388ff;">글쓰기</span>
+    </div>
+
+    <div class="card">
+      <span class="num">#18</span>
+      <span class="emoji">🦸</span>
+      <div class="company">리더십 그룹</div>
+      <div class="ceo">CEO 권태민</div>
+      <div class="slogan">"앞장서서 이끄는 힘! 모두가 따라오고 싶은 리더."</div>
+      <span class="tag" style="background:rgba(124,158,255,0.12);color:#7c9eff;">리더십</span>
+    </div>
+
+    <div class="card">
+      <span class="num">#19</span>
+      <span class="emoji">🧩</span>
+      <div class="company">퍼즐 팩토리</div>
+      <div class="ceo">CEO 신유빈</div>
+      <div class="slogan">"문제가 생기면 달려옵니다! 해결 방법을 찾는 전문가."</div>
+      <span class="tag" style="background:rgba(128,203,196,0.12);color:#80cbc4;">문제해결</span>
+    </div>
+
+    <div class="card">
+      <span class="num">#20</span>
+      <span class="emoji">🤝</span>
+      <div class="company">우정 주식회사</div>
+      <div class="ceo">CEO 장하율</div>
+      <div class="slogan">"혼자보다 함께! 팀워크로 무엇이든 해낼 수 있어요."</div>
+      <span class="tag" style="background:rgba(244,143,177,0.12);color:#f48fb1;">협동</span>
+    </div>
+
+  </div>
+
+  <div class="tip-box">
+    <h3>나만의 기업 설계 TIP</h3>
+    <ul>
+      <li><b>내가 잘하는 것</b>을 생각해보세요. 정리, 그림, 운동, 독서 등 뭐든 좋아요!</li>
+      <li><b>회사 이름</b>은 짧고 기억에 남는 게 좋아요. "OO 주식회사", "OO 컴퍼니" 등 자유롭게!</li>
+      <li><b>슬로건</b>은 우리 회사가 어떤 회사인지 한 줄로 알려주는 문장이에요.</li>
+      <li><b>이모지</b>는 회사의 성격을 보여주는 그림을 골라보세요.</li>
+      <li>꼭 위의 예시처럼 하지 않아도 돼요. <b>나만의 특별한 회사</b>를 만들어 보세요!</li>
+    </ul>
+  </div>
+
+  <button class="print-btn" onclick="window.print()">🖨️ 인쇄하기</button>
+
+</body>
+</html>
