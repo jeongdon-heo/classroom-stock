@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4-2 주식회사 - 교사용 운영 매뉴얼</title>
+<style>
+  :root {
+    --purple: #6366f1;
+    --purple-dark: #4338ca;
+    --purple-light: #eef2ff;
+    --purple-bg: #f5f3ff;
+    --dark: #1e293b;
+    --gray: #64748b;
+    --light-gray: #94a3b8;
+    --border: #e2e8f0;
+    --bg: #f8fafc;
+    --white: #ffffff;
+    --green: #16a34a;
+    --green-bg: #f0fdf4;
+    --red: #dc2626;
+    --red-bg: #fef2f2;
+    --amber: #d97706;
+    --amber-bg: #fffbeb;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Pretendard', 'Noto Sans KR', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--dark);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  /* ── 헤더 ── */
+  .header {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6, #a78bfa);
+    color: white;
+    padding: 28px 32px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 20px rgba(99,102,241,0.25);
+  }
+  .header h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
+  .header p { font-size: 14px; opacity: 0.85; margin-top: 4px; }
+
+  /* ── 탭 네비 ── */
+  .tab-nav {
+    display: flex;
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    position: sticky;
+    top: 82px;
+    z-index: 99;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+  .tab-nav::-webkit-scrollbar { height: 0; }
+  .tab-btn {
+    flex-shrink: 0;
+    padding: 12px 18px;
+    border: none;
+    background: none;
+    color: var(--light-gray);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+    font-family: inherit;
+  }
+  .tab-btn:hover { color: var(--purple); background: var(--purple-light); }
+  .tab-btn.active {
+    color: var(--purple);
+    border-bottom-color: var(--purple);
+    font-weight: 700;
+    background: var(--purple-light);
+  }
+
+  /* ── 콘텐츠 ── */
+  .content { max-width: 860px; margin: 0 auto; padding: 32px 24px 80px; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  h2 {
+    font-size: 22px;
+    color: var(--purple-dark);
+    font-weight: 800;
+    margin: 32px 0 16px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--purple);
+  }
+  h2:first-child { margin-top: 0; }
+
+  h3 {
+    font-size: 17px;
+    color: var(--purple);
+    font-weight: 700;
+    margin: 24px 0 10px;
+  }
+
+  p { margin-bottom: 12px; }
+
+  strong { color: var(--dark); }
+
+  /* ── 리스트 ── */
+  ul, ol { margin: 8px 0 16px 20px; }
+  li { margin-bottom: 6px; }
+  ol li { padding-left: 4px; }
+
+  /* ── 테이블 ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 20px;
+    font-size: 14px;
+  }
+  th {
+    background: var(--purple-light);
+    color: var(--purple-dark);
+    font-weight: 700;
+    text-align: left;
+    padding: 10px 14px;
+    border: 1px solid #c7d2fe;
+  }
+  td {
+    padding: 9px 14px;
+    border: 1px solid var(--border);
+  }
+  tr:nth-child(even) td { background: #fafbff; }
+
+  /* ── 박스 ── */
+  .tip {
+    background: var(--purple-bg);
+    border-left: 4px solid var(--purple);
+    padding: 12px 16px;
+    margin: 12px 0 16px;
+    border-radius: 0 8px 8px 0;
+    font-size: 14px;
+    color: var(--purple-dark);
+  }
+  .tip::before { content: "💡 TIP  "; font-weight: 700; }
+
+  .warn {
+    background: var(--red-bg);
+    border-left: 4px solid var(--red);
+    padding: 12px 16px;
+    margin: 12px 0 16px;
+    border-radius: 0 8px 8px 0;
+    font-size: 14px;
+    color: var(--red);
+  }
+  .warn::before { content: "⚠️ 주의  "; font-weight: 700; }
+
+  .example {
+    background: var(--amber-bg);
+    border-left: 4px solid var(--amber);
+    padding: 12px 16px;
+    margin: 12px 0 16px;
+    border-radius: 0 8px 8px 0;
+    font-size: 14px;
+    color: #92400e;
+  }
+
+  /* ── 코드 블록 ── */
+  .code-block {
+    background: var(--dark);
+    color: #e2e8f0;
+    padding: 16px 20px;
+    border-radius: 10px;
+    font-family: 'Consolas', 'D2Coding', monospace;
+    font-size: 13px;
+    line-height: 1.8;
+    margin: 12px 0 20px;
+    overflow-x: auto;
+    white-space: pre;
+  }
+
+  /* ── 카드 ── */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 16px 0;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+  }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .card-grid .card { margin: 0; text-align: center; }
+  .card-grid .card-icon { font-size: 32px; margin-bottom: 8px; }
+  .card-grid .card-title { font-weight: 700; color: var(--purple-dark); font-size: 15px; }
+  .card-grid .card-desc { font-size: 13px; color: var(--gray); margin-top: 4px; }
+
+  /* ── 스케줄 ── */
+  .schedule { display: flex; flex-direction: column; gap: 8px; margin: 16px 0; }
+  .schedule-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--white);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+  .schedule-day {
+    font-weight: 800;
+    color: var(--purple);
+    min-width: 50px;
+    font-size: 14px;
+  }
+  .schedule-task { font-size: 14px; color: var(--dark); }
+
+  /* ── FAQ ── */
+  .faq-item { margin-bottom: 20px; }
+  .faq-q {
+    font-weight: 700;
+    color: var(--purple-dark);
+    font-size: 15px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .faq-q::before {
+    content: "Q";
+    background: var(--purple);
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+  .faq-a { margin-left: 32px; color: var(--gray); font-size: 14px; }
+
+  /* ── 뱃지 ── */
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .badge-green { background: var(--green-bg); color: var(--green); }
+  .badge-red { background: var(--red-bg); color: var(--red); }
+  .badge-purple { background: var(--purple-light); color: var(--purple); }
+  .badge-amber { background: var(--amber-bg); color: var(--amber); }
+
+  /* ── 인쇄 ── */
+  .print-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--purple);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(99,102,241,0.3);
+    font-family: inherit;
+    z-index: 200;
+  }
+  .print-btn:hover { background: var(--purple-dark); }
+
+  @media print {
+    .header { position: static; }
+    .tab-nav, .print-btn { display: none !important; }
+    .tab-panel { display: block !important; page-break-before: always; }
+    .tab-panel:first-child { page-break-before: auto; }
+    .content { max-width: 100%; padding: 0; }
+  }
+
+  @media (max-width: 640px) {
+    .header { padding: 20px 16px; }
+    .header h1 { font-size: 20px; }
+    .content { padding: 20px 16px 80px; }
+    .tab-btn { padding: 10px 14px; font-size: 12px; }
+    h2 { font-size: 19px; }
+    .card-grid { grid-template-columns: 1fr; }
+    .schedule-row { flex-direction: column; gap: 4px; }
+  }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="header">
+  <h1>🏢 4-2 주식회사</h1>
+  <p>교사용 운영 매뉴얼</p>
+</div>
+
+<nav class="tab-nav" id="tabNav">
+  <button class="tab-btn active" data-tab="intro">앱 소개</button>
+  <button class="tab-btn" data-tab="start">시작하기</button>
+  <button class="tab-btn" data-tab="weekly">주간 운영</button>
+  <button class="tab-btn" data-tab="trade">거래</button>
+  <button class="tab-btn" data-tab="admin">관리자 기능</button>
+  <button class="tab-btn" data-tab="screen">화면 설명</button>
+  <button class="tab-btn" data-tab="tips">수업 팁</button>
+  <button class="tab-btn" data-tab="faq">FAQ</button>
+  <button class="tab-btn" data-tab="formula">정산 계산식</button>
+  <button class="tab-btn" data-tab="curriculum">교육과정 연계</button>
+</nav>
+
+<div class="content">
+
+<!-- ═══════ 앱 소개 ═══════ -->
+<div class="tab-panel active" id="tab-intro">
+  <h2>앱 소개</h2>
+  <p><strong>4-2 주식회사</strong>는 초등학교 교실에서 주식 시뮬레이션을 통해 경제 개념을 배우는 교육용 웹 앱입니다.</p>
+  <p>각 학생이 자신의 1인 기업(주식회사)을 만들고, 학교생활 성과에 따라 주가가 변동됩니다.<br>학생들은 가상 화폐로 친구의 회사에 투자하며 경제 원리를 자연스럽게 학습합니다.</p>
+
+  <h3>핵심 개념</h3>
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-icon">🏢</div>
+      <div class="card-title">주식회사</div>
+      <div class="card-desc">학생 1명 = 1개 회사<br>회사 이름, 슬로건, 이모지를 직접 정함</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">📈</div>
+      <div class="card-title">주가</div>
+      <div class="card-desc">학교생활 성과에 따라 매주 변동<br>(포인트, 미션, 투표)</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">💰</div>
+      <div class="card-title">현금</div>
+      <div class="card-desc">CEO 급여 + 사업 수익 + 행운권<br>투자에 사용</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🤝</div>
+      <div class="card-title">투자</div>
+      <div class="card-desc">다른 친구 회사 주식을 매매<br>최대 3주까지 보유 가능</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">📊</div>
+      <div class="card-title">정산</div>
+      <div class="card-desc">매주 1회 실행<br>포인트/미션/투표 → 주가 반영</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ 시작하기 ═══════ -->
+<div class="tab-panel" id="tab-start">
+  <h2>시작하기</h2>
+
+  <h3>최초 설정</h3>
+  <ol>
+    <li>앱에 접속합니다.</li>
+    <li><strong>관리자 &gt; 학생관리</strong> 탭으로 이동합니다.</li>
+    <li><strong>일괄 등록</strong> 버튼을 클릭합니다.</li>
+    <li>학생 이름을 한 줄에 하나씩 입력하고 <strong>일괄 등록하기</strong>를 누릅니다.</li>
+    <li>회사 이름은 자동으로 "OOO 주식회사"로 생성됩니다.</li>
+    <li>학생들에게 회사 이름과 슬로건을 직접 정하게 합니다.</li>
+  </ol>
+  <div class="tip">"예시 데이터" 버튼으로 8명의 샘플 데이터를 불러와 미리 테스트해볼 수 있습니다.</div>
+
+  <h3>학생 정보 수정</h3>
+  <ul>
+    <li><strong>학생관리</strong> 탭에서 회사 이름, 슬로건, 이모지를 클릭하면 바로 수정 가능</li>
+    <li>학생 추가: <strong>개별 추가</strong> 버튼 (전학생 등)</li>
+    <li>학생 삭제: 해당 학생 옆 휴지통 아이콘</li>
+  </ul>
+
+  <h3>초기 상태</h3>
+  <table>
+    <tr><th>항목</th><th>값</th></tr>
+    <tr><td>시작 주가</td><td><strong>1,000원</strong></td></tr>
+    <tr><td>시작 현금</td><td><strong>10,000원</strong></td></tr>
+    <tr><td>주식 보유 한도</td><td>1개 회사당 <strong>최대 3주</strong></td></tr>
+  </table>
+</div>
+
+<!-- ═══════ 주간 운영 ═══════ -->
+<div class="tab-panel" id="tab-weekly">
+  <h2>주간 운영 흐름</h2>
+
+  <h3>한 주의 흐름 (권장)</h3>
+  <div class="schedule">
+    <div class="schedule-row">
+      <span class="schedule-day">월요일</span>
+      <span class="schedule-task">미션 설정 + 지난 주 보고서 나눠주기</span>
+    </div>
+    <div class="schedule-row">
+      <span class="schedule-day">화~목</span>
+      <span class="schedule-task">수업 중 포인트 부여 / 행운권 지급</span>
+    </div>
+    <div class="schedule-row">
+      <span class="schedule-day">금요일</span>
+      <span class="schedule-task">미션 등급 입력 → 투표 → 정산 실행 → 거래 시간 (주식 매매)</span>
+    </div>
+  </div>
+
+  <h3>미션 설정 <span class="badge badge-purple">관리자 &gt; 미션</span></h3>
+  <ol>
+    <li>이번 주 미션을 입력합니다. (예: "독서록 3편 작성하기")</li>
+    <li><strong>설정</strong> 버튼을 누르면 헤더에 미션이 표시됩니다.</li>
+    <li>금요일까지 각 학생에게 미션 등급(S/A/B/미완수)을 부여합니다.</li>
+  </ol>
+  <table>
+    <tr><th>등급</th><th>주가 반영</th><th>사업 수익 (현금)</th></tr>
+    <tr><td><strong>S</strong></td><td><span class="badge badge-green">+500</span></td><td>+300원</td></tr>
+    <tr><td><strong>A</strong></td><td><span class="badge badge-green">+300</span></td><td>+200원</td></tr>
+    <tr><td><strong>B</strong></td><td><span class="badge badge-purple">+100</span></td><td>+100원</td></tr>
+    <tr><td><strong>미완수</strong></td><td><span class="badge badge-red">-100</span></td><td>0원</td></tr>
+  </table>
+
+  <h3>선생님 포인트 <span class="badge badge-purple">관리자 &gt; 포인트</span></h3>
+  <p>수업 태도, 과제, 생활 등을 평가하여 포인트를 줍니다.</p>
+  <ul>
+    <li><strong>+100, +50</strong>: 좋은 행동</li>
+    <li><strong>-50, -100</strong>: 개선 필요</li>
+  </ul>
+  <div class="tip">포인트는 정산 시 주가에 직접 반영됩니다.</div>
+
+  <h3>행운권 <span class="badge badge-purple">관리자 &gt; 행운권</span></h3>
+  <p>아침활동, 독서록, 돌발미션 등 다양한 사유로 행운권을 지급합니다.</p>
+  <p>지급 시 학생이 선택:</p>
+  <ul>
+    <li><strong>가상 화폐</strong>: 행운권 1장 = 100원으로 즉시 현금 전환</li>
+    <li><strong>실물 행운권</strong>: 실물 행운권으로 받기 (학기말 추첨 등에 사용)</li>
+  </ul>
+  <table>
+    <tr><th>사유</th><th>행운권 수</th></tr>
+    <tr><td>🌅 아침활동</td><td>1장</td></tr>
+    <tr><td>📖 독서록</td><td>2장</td></tr>
+    <tr><td>⭐ 돌발미션 (쉬움)</td><td>1장</td></tr>
+    <tr><td>⭐⭐ 돌발미션 (보통)</td><td>2장</td></tr>
+    <tr><td>⭐⭐⭐ 돌발미션 (어려움)</td><td>3장</td></tr>
+    <tr><td>🌟 돌발미션 (최고난도)</td><td>5장</td></tr>
+    <tr><td>🎫 기타 (직접 입력)</td><td>자유 설정</td></tr>
+  </table>
+
+  <h3>친구 평가/투표 <span class="badge badge-purple">관리자 &gt; 투표</span></h3>
+  <ol>
+    <li>학생들이 "이번 주 가장 열심히 한 친구"에게 투표합니다.</li>
+    <li>선생님이 투표 결과를 입력합니다 (+1표 버튼).</li>
+  </ol>
+  <p>정산 시 반영:</p>
+  <ul>
+    <li>상위 30%: <span class="badge badge-green">+400</span></li>
+    <li>중위: <span class="badge badge-purple">+100</span></li>
+    <li>하위 30%: <span class="badge badge-red">-100</span></li>
+  </ul>
+  <div class="tip">초기화 버튼으로 매주 투표를 리셋합니다.</div>
+
+  <h3>정산 <span class="badge badge-purple">관리자 &gt; 정산</span></h3>
+  <ol>
+    <li>포인트, 미션 등급, 투표가 모두 입력되었는지 확인합니다.</li>
+    <li><strong>정산 미리보기</strong>에서 각 학생의 변동 사항을 확인합니다.</li>
+    <li><strong>정산 실행</strong> 버튼을 누릅니다.</li>
+  </ol>
+  <p>정산 시 일어나는 일:</p>
+  <ul>
+    <li>포인트 + 미션 + 투표 점수 → <strong>주가에 반영</strong></li>
+    <li>새 주가의 10% → <strong>CEO 급여</strong> (현금 지급)</li>
+    <li>미션 등급에 따른 → <strong>사업 수익</strong> (현금 지급)</li>
+    <li>주차가 1 증가</li>
+    <li>모든 포인트/미션/투표 초기화</li>
+  </ul>
+  <div class="warn">정산은 되돌릴 수 없습니다! 미리보기를 꼭 확인하세요.</div>
+</div>
+
+<!-- ═══════ 거래 ═══════ -->
+<div class="tab-panel" id="tab-trade">
+  <h2>거래 (거래소 탭)</h2>
+  <p>학생들이 직접 또는 선생님이 대리로 주식을 매매합니다.</p>
+
+  <h3>매매 방법</h3>
+  <ol>
+    <li><strong>매수/매도</strong> 선택</li>
+    <li><strong>투자자</strong> 선택 (누가 사는지)</li>
+    <li><strong>대상 회사</strong> 선택 (어느 회사 주식인지)</li>
+    <li><strong>수량</strong> 선택 (1~3주)</li>
+    <li><strong>매수하기/매도하기</strong> 클릭</li>
+  </ol>
+
+  <h3>규칙</h3>
+  <table>
+    <tr><th>규칙</th><th>설명</th></tr>
+    <tr><td>자기 주식 매수 불가</td><td>자기 회사 주식은 살 수 없음</td></tr>
+    <tr><td>보유 한도</td><td>한 회사당 최대 <strong>3주</strong>까지 보유 가능</td></tr>
+    <tr><td>잔액 확인</td><td>잔액이 부족하면 매수 불가</td></tr>
+    <tr><td>보유 확인</td><td>보유하지 않은 주식은 매도 불가</td></tr>
+  </table>
+
+  <h3>운영 팁</h3>
+  <ul>
+    <li>금요일 정산 후 <strong>10~15분 거래 시간</strong>을 줍니다.</li>
+    <li>학생들이 "왜 이 회사에 투자하는지" 이유를 말하게 하면 교육 효과 UP</li>
+    <li>처음엔 선생님이 대리 거래, 익숙해지면 학생 스스로 (태블릿 등)</li>
+  </ul>
+  <div class="example">
+    <strong>💬 활용 예시</strong><br>
+    "김도윤 학생, 왜 아이디어 랩에 투자하고 싶어요?"<br>
+    "이서연이가 이번 주 미션도 S받고, 발표도 잘해서 주가가 더 오를 것 같아요!"
+  </div>
+</div>
+
+<!-- ═══════ 관리자 기능 ═══════ -->
+<div class="tab-panel" id="tab-admin">
+  <h2>관리자 기능 상세</h2>
+
+  <h3>특별 이벤트 <span class="badge badge-purple">관리자 &gt; 이벤트</span></h3>
+  <p>깜짝 호재/악재를 발생시켜 포인트를 줍니다.</p>
+  <ul>
+    <li>대상: 전체 또는 특정 학생 선택</li>
+    <li>금액: -200 ~ +300</li>
+    <li>예시: "청소 우수 보너스 +200!", "지각 -100"</li>
+  </ul>
+
+  <h3>일괄 지급 <span class="badge badge-purple">관리자 &gt; 일괄지급</span></h3>
+  <p>전체 학생에게 동일한 현금을 지급하거나 차감합니다.</p>
+  <ul>
+    <li>사용 예시: 기본 용돈 지급, 세금 징수, 특별 보너스</li>
+    <li>금액을 선택하거나 직접 입력</li>
+    <li>차감 시 잔액 0원 미만으로는 내려가지 않음</li>
+  </ul>
+
+  <h3>시장 조절 <span class="badge badge-purple">관리자 &gt; 시장조절</span></h3>
+  <p>전체 주가를 비율(%)로 올리거나 내립니다.</p>
+  <ul>
+    <li><strong>호황</strong>: 전체 주가 상승 (예: +10%)</li>
+    <li><strong>불황</strong>: 전체 주가 하락 (예: -10%)</li>
+    <li>미리보기에서 변동 결과를 확인할 수 있음</li>
+  </ul>
+  <div class="example">
+    <strong>💬 활용 예시</strong><br>
+    "오늘 실제로 코스피가 3% 올랐으니, 우리 교실 시장도 호황입니다!"
+  </div>
+
+  <h3>활동 현황 <span class="badge badge-purple">관리자 &gt; 활동현황</span></h3>
+  <p>학생별 활동 데이터를 한눈에 확인합니다.</p>
+  <ul>
+    <li>거래 횟수, 행운권 수, 투자 종목 수, 투자자 수</li>
+    <li>주가 상승률 TOP / 총자산 TOP 랭킹</li>
+    <li>수업 중 칭찬이나 피드백에 활용</li>
+  </ul>
+
+  <h3>경매 <span class="badge badge-purple">관리자 &gt; 경매</span></h3>
+  <p>학기말 주주총회에서 과자 경매를 진행할 수 있습니다.</p>
+  <ol>
+    <li>경매 물품을 등록합니다 (이름, 이모지, 시작가).</li>
+    <li><strong>경매 시작</strong> 버튼을 누릅니다.</li>
+    <li>학생 이름을 클릭하면 100원씩 입찰가가 올라갑니다.</li>
+    <li>더 이상 입찰자가 없으면 <strong>낙찰</strong> 버튼을 누릅니다.</li>
+    <li>낙찰가가 해당 학생의 현금에서 차감됩니다.</li>
+  </ol>
+
+  <h3>보고서 <span class="badge badge-purple">관리자 &gt; 보고서</span></h3>
+  <p>학생 개인별 주간 보고서를 인쇄할 수 있습니다.</p>
+  <ul>
+    <li>A4 용지에 1명씩 출력</li>
+    <li>주가 순위, 자산 현황, CEO 수익, 투자 내역, 주가 추이 포함</li>
+    <li>학생이 직접 "소감"을 작성하는 란 포함</li>
+    <li><strong>미리보기/인쇄</strong> 버튼으로 바로 출력</li>
+  </ul>
+</div>
+
+<!-- ═══════ 화면 설명 ═══════ -->
+<div class="tab-panel" id="tab-screen">
+  <h2>화면 설명</h2>
+
+  <h3>📊 대시보드</h3>
+  <ul>
+    <li>상장 기업 수, 평균 주가, 총 거래, 현재 주차 통계</li>
+    <li>전체 주가 추이 그래프</li>
+    <li>종목별 카드 (클릭하면 상세 정보)</li>
+  </ul>
+
+  <h3>👤 학생 상세 (종목 카드 클릭)</h3>
+  <ul>
+    <li>현재 주가, 보유 현금, 총 자산, 누적 수익률</li>
+    <li>이번 주 변동, CEO 급여, 사업 수익</li>
+    <li>주가 추이 차트</li>
+    <li>우리 회사 투자자 (누가 나에게 투자했는지)</li>
+    <li>보유 주식 (투자 원금 / 현재 가치 / 손익)</li>
+    <li>최근 거래 내역</li>
+  </ul>
+
+  <h3>💰 거래소</h3>
+  <ul>
+    <li>주식 매매 폼 (매수/매도)</li>
+    <li>거래 기록 (최근 30건)</li>
+  </ul>
+
+  <h3>🏆 순위표</h3>
+  <ul>
+    <li>주가 순위 / 총자산 순위 전환</li>
+    <li>1~3위 포디움 + 나머지 리스트</li>
+    <li>비교 차트</li>
+  </ul>
+
+  <h3>⚙️ 관리자</h3>
+  <p>행운권, 포인트, 미션, 투표, 이벤트, 일괄지급, 시장조절, 활동현황, 학생관리, 정산, 경매, 보고서 — 총 12개 서브탭으로 구성</p>
+</div>
+
+<!-- ═══════ 수업 팁 ═══════ -->
+<div class="tab-panel" id="tab-tips">
+  <h2>수업 운영 팁</h2>
+
+  <h3>📗 첫 주 (도입)</h3>
+  <ol>
+    <li>"주식이 뭘까?" 이야기 나누기</li>
+    <li>각자 회사 이름, 슬로건 정하기</li>
+    <li>이모지로 회사 로고 만들기</li>
+    <li>첫 미션 설정 후 1주일 관찰</li>
+  </ol>
+
+  <h3>📘 2~3주차 (적응)</h3>
+  <ol>
+    <li>정산 과정을 학생들과 함께 보기 (빔프로젝터)</li>
+    <li>투표 시간에 "왜 이 친구에게 투표하는지" 발표</li>
+    <li>거래 시간에 투자 이유 발표하기</li>
+    <li>보고서 나눠주고 소감 작성</li>
+  </ol>
+
+  <h3>📙 4주차 이후 (심화)</h3>
+  <ol>
+    <li>시장 조절 기능으로 호황/불황 경험</li>
+    <li>뉴스와 연계 (예: "금리 인상 → 불황")</li>
+    <li>학생들이 투자 전략 발표하기</li>
+    <li>반 경제 신문 만들기</li>
+  </ol>
+
+  <h3>📕 학기말</h3>
+  <ol>
+    <li>과자 경매로 보유 현금 활용</li>
+    <li>최종 순위 시상</li>
+    <li>"나의 경제 활동 돌아보기" 활동</li>
+  </ol>
+
+  <div class="tip">
+    처음에는 선생님이 모든 조작을 하다가, 2~3주차부터 학생들에게 태블릿을 줘서 직접 거래하게 하면 몰입도가 높아집니다.
+  </div>
+</div>
+
+<!-- ═══════ FAQ ═══════ -->
+<div class="tab-panel" id="tab-faq">
+  <h2>자주 묻는 질문 (FAQ)</h2>
+
+  <div class="faq-item">
+    <div class="faq-q">데이터가 날아갔어요!</div>
+    <div class="faq-a">데이터는 Firebase 클라우드에 자동 저장됩니다. 인터넷 연결을 확인해주세요. 새로고침하면 서버에서 최신 데이터를 불러옵니다.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q">주가가 너무 높아졌어요/낮아졌어요</div>
+    <div class="faq-a"><strong>시장 조절</strong> 기능으로 전체 주가를 비율로 조정할 수 있습니다. 또는 포인트를 조절하여 다음 정산에서 균형을 맞출 수 있습니다.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q">잘못 거래했어요</div>
+    <div class="faq-a">반대 거래를 실행하세요. (매수 실수 → 매도로 되돌리기) 직접 수정 기능은 없으므로, 반대 거래로 원상복구합니다.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q">정산을 잘못 실행했어요</div>
+    <div class="faq-a">정산은 되돌릴 수 없습니다. 다음 주차에 포인트 조정으로 보정해주세요.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q">전학생이 왔어요</div>
+    <div class="faq-a"><strong>학생관리 &gt; 개별 추가</strong>로 새 학생을 등록합니다. 시작 주가 1,000원, 현금 10,000원으로 시작합니다. 필요하면 <strong>일괄지급</strong>으로 추가 현금을 줄 수 있습니다.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q">학생이 전학갔어요</div>
+    <div class="faq-a"><strong>학생관리</strong>에서 해당 학생을 삭제합니다. 해당 학생에게 투자한 다른 학생의 주식은 자동으로 사라지므로, 삭제 전에 관련 학생들의 매도를 먼저 처리하는 것을 권장합니다.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q">모바일에서도 사용할 수 있나요?</div>
+    <div class="faq-a">네! 스마트폰, 태블릿에서도 사용 가능합니다. 모바일에서는 하단 탭바로 메뉴를 이동합니다.</div>
+  </div>
+</div>
+
+<!-- ═══════ 정산 계산식 ═══════ -->
+<div class="tab-panel" id="tab-formula">
+  <h2>정산 계산식 상세</h2>
+
+  <div class="card">
+    <h3>주가 계산</h3>
+    <div class="code-block">새 주가 = MAX(100, 현재 주가 + 선생님 포인트 + 미션 점수 + 투표 점수)</div>
+    <p>주가는 최소 <strong>100원</strong> 이하로 내려가지 않습니다.</p>
+  </div>
+
+  <div class="card">
+    <h3>CEO 급여</h3>
+    <div class="code-block">CEO 급여 = 새 주가 × 10%  (소수점 반올림)</div>
+    <p>정산 후 새 주가 기준으로 계산됩니다.</p>
+  </div>
+
+  <div class="card">
+    <h3>사업 수익</h3>
+    <table>
+      <tr><th>미션 등급</th><th>사업 수익</th></tr>
+      <tr><td>S</td><td><strong>+300원</strong></td></tr>
+      <tr><td>A</td><td><strong>+200원</strong></td></tr>
+      <tr><td>B</td><td><strong>+100원</strong></td></tr>
+      <tr><td>미완수</td><td>0원</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>최종 현금</h3>
+    <div class="code-block">새 현금 = 현재 현금 + CEO 급여 + 사업 수익</div>
+  </div>
+
+  <div class="card" style="background: var(--purple-light);">
+    <h3>예시 계산</h3>
+    <p>현재 주가 1,500원 / 포인트 +100 / 미션 A(+300) / 투표 상위(+400)</p>
+    <div class="code-block">새 주가 = 1,500 + 100 + 300 + 400 = 2,300원
+CEO 급여 = 2,300 × 10% = 230원
+사업 수익 = 200원 (A등급)
+현금 증가 = 230 + 200 = 430원</div>
+  </div>
+</div>
+
+<!-- ═══════ 교육과정 연계 ═══════ -->
+<div class="tab-panel" id="tab-curriculum">
+  <h2>교육과정 연계</h2>
+
+  <table>
+    <tr><th>교과</th><th>연계 활동</th></tr>
+    <tr><td><strong>사회</strong></td><td>경제 개념 (생산, 소비, 투자, 시장), 금융 교육</td></tr>
+    <tr><td><strong>수학</strong></td><td>퍼센트 계산, 손익 계산, 그래프 읽기</td></tr>
+    <tr><td><strong>국어</strong></td><td>회사 소개 글쓰기, 투자 전략 발표, 경제 신문 만들기</td></tr>
+    <tr><td><strong>도덕</strong></td><td>공정한 경쟁, 협력, 정직한 거래</td></tr>
+    <tr><td><strong>창체</strong></td><td>진로 교육 (CEO 체험), 경제 교육</td></tr>
+  </table>
+
+  <h3>차시별 활용 예시</h3>
+  <div class="card">
+    <table>
+      <tr><th>차시</th><th>교과</th><th>활동</th></tr>
+      <tr><td>1차시</td><td>사회</td><td>"경제란 무엇인가?" — 주식회사 개념 소개, 회사 설립</td></tr>
+      <tr><td>2차시</td><td>국어</td><td>"우리 회사 소개서 쓰기" — 회사명, 슬로건, 목표 작성</td></tr>
+      <tr><td>3차시</td><td>수학</td><td>"주가 변동 읽기" — 그래프 해석, 퍼센트 계산 연습</td></tr>
+      <tr><td>4차시</td><td>사회</td><td>"투자란?" — 모의 투자 체험, 거래 실습</td></tr>
+      <tr><td>5차시</td><td>도덕</td><td>"공정한 거래" — 정직한 경쟁과 협력의 가치</td></tr>
+      <tr><td>6차시</td><td>국어</td><td>"투자 전략 발표" — 근거 있는 주장 만들기</td></tr>
+      <tr><td>7차시</td><td>수학</td><td>"손익 계산하기" — 내 투자의 수익률 계산</td></tr>
+      <tr><td>8차시</td><td>사회</td><td>"호황과 불황" — 시장 상황에 따른 대응 전략</td></tr>
+      <tr><td>9차시</td><td>국어</td><td>"반 경제 신문 만들기" — 이번 주 시장 소식 기사 작성</td></tr>
+      <tr><td>10차시</td><td>창체</td><td>"주주총회 & 경매" — 학기말 결산, 시상, 소감 나누기</td></tr>
+    </table>
+  </div>
+</div>
+
+</div><!-- /.content -->
+
+<button class="print-btn" onclick="window.print()">🖨️ 인쇄하기</button>
+
+<script>
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
