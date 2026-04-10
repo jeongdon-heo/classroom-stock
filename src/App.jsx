@@ -164,6 +164,7 @@ export default function App() {
   }
 
   const isMobile = useIsMobile();
+  const isAdmin = new URLSearchParams(window.location.search).has("admin");
 
   if (loading) return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", background: "#f0f4ff", color: "#1e293b", fontFamily: "'Noto Sans KR', sans-serif" }}>
@@ -175,7 +176,7 @@ export default function App() {
     { id: "dashboard", label: "대시보드", icon: <BarChart3 size={18} /> },
     { id: "trade", label: "거래소", icon: <ShoppingCart size={18} /> },
     { id: "ranking", label: "순위표", icon: <Trophy size={18} /> },
-    { id: "admin", label: "관리자", icon: <Settings size={18} /> },
+    ...(isAdmin ? [{ id: "admin", label: "관리자", icon: <Settings size={18} /> }] : []),
   ];
 
   const ctx = {
@@ -219,7 +220,7 @@ export default function App() {
         {tab === "dashboard" && <Dashboard />}
         {tab === "trade" && <Trade />}
         {tab === "ranking" && <Ranking />}
-        {tab === "admin" && <Admin />}
+        {tab === "admin" && isAdmin && <Admin />}
       </main>
 
       {/* 모바일 하단 탭바 */}
