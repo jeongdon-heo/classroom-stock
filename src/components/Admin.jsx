@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Star, Users, Target, Vote, Zap, Gift, RefreshCw, Award, Printer, Plus, Minus, Trash2, Sparkles } from "lucide-react";
+import { Star, Users, Target, Vote, Zap, Gift, RefreshCw, Award, Printer, Plus, Minus, Trash2, Sparkles, DollarSign, TrendingUp, BarChart3 } from "lucide-react";
 import { useApp } from "../context/AppContext";
 import { DEFAULT_STOCK_PRICE, DEFAULT_CASH, GRADES, MISSION_CASH, SALARY_RATE, TICKET_VALUE, TICKET_REASONS } from "../constants";
 import { uid } from "../utils";
@@ -8,7 +8,7 @@ import Card from "./Card";
 import ReportOverlay from "./ReportOverlay";
 
 export default function Admin() {
-  const { students, setStudents, week, mission, setMission, evts, setEvts, settle, resetAll, loadSample, showAdd, setShowAdd, persist, txs, showReport, setShowReport, portfolioVal, ticketLog, saveTickets } = useApp();
+  const { students, setStudents, week, mission, setMission, evts, setEvts, settle, resetAll, loadSample, showAdd, setShowAdd, persist, txs, showReport, setShowReport, portfolioVal, ticketLog, saveTickets, isMobile } = useApp();
   const [sub, setSub] = useState("ticket");
   const [nm, setNm] = useState(mission);
   const [ed, setEd] = useState("");
@@ -29,6 +29,10 @@ export default function Admin() {
   const [aucNewName, setAucNewName] = useState("");
   const [aucNewEmoji, setAucNewEmoji] = useState("🍫");
   const [aucNewStart, setAucNewStart] = useState(500);
+  const [bulkCashAmt, setBulkCashAmt] = useState(500);
+  const [bulkCashMsg, setBulkCashMsg] = useState(null);
+  const [marketPct, setMarketPct] = useState(10);
+  const [marketMsg, setMarketMsg] = useState(null);
 
   const giveTicket = (studentId, reasonId, choice) => {
     const reason = TICKET_REASONS.find(r => r.id === reasonId);
@@ -78,10 +82,13 @@ export default function Admin() {
 
   const subs = [
     { id: "ticket", label: "행운권", icon: <Gift size={15} /> },
-    { id: "points", label: "포인���", icon: <Star size={15} /> },
+    { id: "points", label: "포인트", icon: <Star size={15} /> },
     { id: "mission", label: "미션", icon: <Target size={15} /> },
     { id: "vote", label: "투표", icon: <Vote size={15} /> },
     { id: "event", label: "이벤트", icon: <Zap size={15} /> },
+    { id: "bulkCash", label: "일괄지급", icon: <DollarSign size={15} /> },
+    { id: "market", label: "시장조절", icon: <TrendingUp size={15} /> },
+    { id: "activity", label: "활동현황", icon: <BarChart3 size={15} /> },
     { id: "manage", label: "학생관리", icon: <Users size={15} /> },
     { id: "settle", label: "정산", icon: <RefreshCw size={15} /> },
     { id: "auction", label: "🔨경매", icon: <Award size={15} /> },
@@ -90,9 +97,9 @@ export default function Admin() {
 
   return (
     <div>
-      <div style={{ display: "flex", gap: 4, marginBottom: 20, flexWrap: "wrap" }}>
+      <div className="admin-subtabs" style={{ display: "flex", gap: 4, marginBottom: 20, flexWrap: isMobile ? "nowrap" : "wrap" }}>
         {subs.map(t => (
-          <button key={t.id} onClick={() => setSub(t.id)} style={{ display: "flex", alignItems: "center", gap: 5, padding: "8px 14px", background: sub === t.id ? "rgba(100,130,255,0.15)" : "rgba(100,130,255,0.03)", border: `1px solid ${sub === t.id ? "rgba(120,160,255,0.3)" : "rgba(120,140,255,0.08)"}`, borderRadius: 10, color: sub === t.id ? "#9cb8ff" : "#667", cursor: "pointer", fontSize: 13, fontWeight: sub === t.id ? 600 : 400 }}>
+          <button key={t.id} onClick={() => setSub(t.id)} style={{ display: "flex", alignItems: "center", gap: 5, padding: isMobile ? "8px 12px" : "8px 14px", background: sub === t.id ? "rgba(100,130,255,0.15)" : "rgba(100,130,255,0.03)", border: `1px solid ${sub === t.id ? "rgba(120,160,255,0.3)" : "rgba(120,140,255,0.08)"}`, borderRadius: 10, color: sub === t.id ? "#9cb8ff" : "#667", cursor: "pointer", fontSize: isMobile ? 12 : 13, fontWeight: sub === t.id ? 600 : 400, whiteSpace: "nowrap", flexShrink: 0 }}>
             {t.icon} {t.label}
           </button>
         ))}
@@ -311,9 +318,224 @@ export default function Admin() {
         </Card>
       )}
 
+      {sub === "bulkCash" && (
+        <Card>
+          <h3 style={{ margin: "0 0 4px", fontSize: 15, fontWeight: 600, color: "#9cb8ff" }}>💵 일괄 현금 지급/차감</h3>
+          <p style={{ margin: "0 0 16px", fontSize: 12, color: "#667" }}>전체 학생에게 동일한 금액을 지급하거나 차감합니다.</p>
+
+          {bulkCashMsg && (
+            <div style={{ padding: "12px 16px", borderRadius: 10, marginBottom: 14, background: bulkCashMsg.type === "give" ? "rgba(76,223,139,0.1)" : "rgba(255,107,122,0.1)", border: `1px solid ${bulkCashMsg.type === "give" ? "rgba(76,223,139,0.3)" : "rgba(255,107,122,0.3)"}`, color: bulkCashMsg.type === "give" ? "#4cdf8b" : "#ff6b7a", fontSize: 13 }}>
+              {bulkCashMsg.text}
+            </div>
+          )}
+
+          <label style={ss}>금액</label>
+          <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
+            {[100, 200, 500, 1000, 2000, 5000].map(v => (
+              <button key={v} onClick={() => setBulkCashAmt(v)} style={{ padding: "8px 14px", background: bulkCashAmt === v ? "rgba(100,130,255,0.15)" : "rgba(100,130,255,0.04)", border: `1px solid ${bulkCashAmt === v ? "rgba(120,160,255,0.3)" : "rgba(120,140,255,0.08)"}`, borderRadius: 8, color: bulkCashAmt === v ? "#9cb8ff" : "#778", cursor: "pointer", fontSize: 13, fontWeight: bulkCashAmt === v ? 700 : 400 }}>{v.toLocaleString()}원</button>
+            ))}
+          </div>
+          <div style={{ marginBottom: 16 }}>
+            <label style={ss}>직접 입력</label>
+            <input type="number" value={bulkCashAmt} onChange={e => setBulkCashAmt(Number(e.target.value))} style={{ ...si, maxWidth: 200 }} step={100} />
+          </div>
+
+          <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
+            <button onClick={() => {
+              if (!window.confirm(`전체 학생에게 ${bulkCashAmt.toLocaleString()}원을 지급합니까?`)) return;
+              setStudents(students.map(s => ({ ...s, cash: s.cash + bulkCashAmt })));
+              setBulkCashMsg({ type: "give", text: `전체 ${students.length}명에게 ${bulkCashAmt.toLocaleString()}원 지급 완료!` });
+              setTimeout(() => setBulkCashMsg(null), 3000);
+            }} style={{ flex: 1, padding: 14, background: "linear-gradient(135deg, #2e7d32, #43a047)", border: "none", borderRadius: 12, color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer" }}>
+              💰 전체 지급 (+{bulkCashAmt.toLocaleString()}원)
+            </button>
+            <button onClick={() => {
+              if (!window.confirm(`전체 학생에게서 ${bulkCashAmt.toLocaleString()}원을 차감합니까?`)) return;
+              setStudents(students.map(s => ({ ...s, cash: Math.max(0, s.cash - bulkCashAmt) })));
+              setBulkCashMsg({ type: "deduct", text: `전체 ${students.length}명에게서 ${bulkCashAmt.toLocaleString()}원 차감 완료!` });
+              setTimeout(() => setBulkCashMsg(null), 3000);
+            }} style={{ flex: 1, padding: 14, background: "linear-gradient(135deg, #c62828, #e53935)", border: "none", borderRadius: 12, color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer" }}>
+              💸 전체 차감 (-{bulkCashAmt.toLocaleString()}원)
+            </button>
+          </div>
+
+          <h4 style={{ margin: "0 0 8px", fontSize: 13, color: "#778" }}>현재 학생별 보유 현금</h4>
+          <div style={{ display: "grid", gap: 4 }}>
+            {[...students].sort((a, b) => b.cash - a.cash).map(s => (
+              <div key={s.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 12px", background: "rgba(100,130,255,0.04)", borderRadius: 8 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ fontSize: 18 }}>{s.emoji}</span>
+                  <span style={{ fontSize: 13, color: "#ccd" }}>{s.name}</span>
+                </div>
+                <span style={{ fontWeight: 700, color: "#ffd740" }}>{s.cash.toLocaleString()}원</span>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
+      {sub === "market" && (
+        <Card>
+          <h3 style={{ margin: "0 0 4px", fontSize: 15, fontWeight: 600, color: "#9cb8ff" }}>📊 시장 상황 조절</h3>
+          <p style={{ margin: "0 0 16px", fontSize: 12, color: "#667" }}>전체 주가를 비율로 올리거나 내립니다. 호황/불황 시뮬레이션에 사용하세요.</p>
+
+          {marketMsg && (
+            <div style={{ padding: "12px 16px", borderRadius: 10, marginBottom: 14, background: marketMsg.up ? "rgba(76,223,139,0.1)" : "rgba(255,107,122,0.1)", border: `1px solid ${marketMsg.up ? "rgba(76,223,139,0.3)" : "rgba(255,107,122,0.3)"}`, color: marketMsg.up ? "#4cdf8b" : "#ff6b7a", fontSize: 13 }}>
+              {marketMsg.text}
+            </div>
+          )}
+
+          <label style={ss}>변동 비율 (%)</label>
+          <div style={{ display: "flex", gap: 6, marginBottom: 16, flexWrap: "wrap" }}>
+            {[5, 10, 15, 20, 30, 50].map(v => (
+              <button key={v} onClick={() => setMarketPct(v)} style={{ padding: "8px 14px", background: marketPct === v ? "rgba(100,130,255,0.15)" : "rgba(100,130,255,0.04)", border: `1px solid ${marketPct === v ? "rgba(120,160,255,0.3)" : "rgba(120,140,255,0.08)"}`, borderRadius: 8, color: marketPct === v ? "#9cb8ff" : "#778", cursor: "pointer", fontSize: 13, fontWeight: marketPct === v ? 700 : 400 }}>{v}%</button>
+            ))}
+          </div>
+
+          <div style={{ background: "rgba(100,130,255,0.04)", borderRadius: 12, padding: 16, marginBottom: 16, border: "1px solid rgba(120,140,255,0.08)" }}>
+            <h4 style={{ margin: "0 0 8px", fontSize: 13, color: "#b388ff" }}>미리보기</h4>
+            <div style={{ display: "grid", gap: 4 }}>
+              {students.map(s => {
+                const upPrice = Math.round(s.stockPrice * (1 + marketPct / 100));
+                const downPrice = Math.max(100, Math.round(s.stockPrice * (1 - marketPct / 100)));
+                return (
+                  <div key={s.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "6px 10px", fontSize: 12 }}>
+                    <span style={{ color: "#ccd" }}>{s.emoji} {s.name} ({s.stockPrice.toLocaleString()}원)</span>
+                    <div style={{ display: "flex", gap: 16 }}>
+                      <span style={{ color: "#4cdf8b" }}>+{marketPct}% → {upPrice.toLocaleString()}원</span>
+                      <span style={{ color: "#ff6b7a" }}>-{marketPct}% → {downPrice.toLocaleString()}원</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+            <button onClick={() => {
+              if (!window.confirm(`전체 주가를 ${marketPct}% 올립니까? (호황)`)) return;
+              setStudents(students.map(s => {
+                const np = Math.round(s.stockPrice * (1 + marketPct / 100));
+                return { ...s, stockPrice: np, history: [...s.history, { week, price: np, label: `호황` }] };
+              }));
+              setMarketMsg({ up: true, text: `📈 호황! 전체 주가 ${marketPct}% 상승!` });
+              setTimeout(() => setMarketMsg(null), 3000);
+            }} style={{ flex: 1, padding: 14, background: "linear-gradient(135deg, #2e7d32, #43a047)", border: "none", borderRadius: 12, color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer" }}>
+              📈 호황 (+{marketPct}%)
+            </button>
+            <button onClick={() => {
+              if (!window.confirm(`전체 주가를 ${marketPct}% 내립니까? (불황)`)) return;
+              setStudents(students.map(s => {
+                const np = Math.max(100, Math.round(s.stockPrice * (1 - marketPct / 100)));
+                return { ...s, stockPrice: np, history: [...s.history, { week, price: np, label: `불황` }] };
+              }));
+              setMarketMsg({ up: false, text: `📉 불황! 전체 주가 ${marketPct}% 하락!` });
+              setTimeout(() => setMarketMsg(null), 3000);
+            }} style={{ flex: 1, padding: 14, background: "linear-gradient(135deg, #c62828, #e53935)", border: "none", borderRadius: 12, color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer" }}>
+              📉 불황 (-{marketPct}%)
+            </button>
+          </div>
+        </Card>
+      )}
+
+      {sub === "activity" && (
+        <div>
+          <Card style={{ marginBottom: 16 }}>
+            <h3 style={{ margin: "0 0 4px", fontSize: 15, fontWeight: 600, color: "#9cb8ff" }}>📋 학생 활동 현황</h3>
+            <p style={{ margin: "0 0 16px", fontSize: 12, color: "#667" }}>각 학생의 거래, 행운권, 투자 현황을 한눈에 확인합니다.</p>
+
+            <div className="settle-preview" style={{ minWidth: 0 }}>
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1.5fr 0.8fr 0.8fr 0.8fr 1fr" : "2fr 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr", gap: 4, fontSize: 10, color: "#778", marginBottom: 6, padding: "0 8px", minWidth: isMobile ? 500 : "auto" }}>
+                <span>학생</span>
+                <span style={{ textAlign: "center" }}>거래 수</span>
+                <span style={{ textAlign: "center" }}>행운권</span>
+                <span style={{ textAlign: "center" }}>투자종목</span>
+                {!isMobile && <span style={{ textAlign: "center" }}>투자자 수</span>}
+                {!isMobile && <span style={{ textAlign: "center" }}>주가등락</span>}
+                <span style={{ textAlign: "center" }}>총자산</span>
+              </div>
+              {[...students].sort((a, b) => {
+                const aAsset = a.cash + portfolioVal(a.portfolio, students);
+                const bAsset = b.cash + portfolioVal(b.portfolio, students);
+                return bAsset - aAsset;
+              }).map(s => {
+                const myTrades = txs.filter(t => t.bid === s.id).length;
+                const myTickets = ticketLog.filter(l => l.studentId === s.id).reduce((sum, l) => sum + l.tickets, 0);
+                const investCount = s.portfolio.length;
+                const investorCount = students.filter(st => st.id !== s.id && st.portfolio.some(p => p.cid === s.id)).length;
+                const pv = portfolioVal(s.portfolio, students);
+                const totalAsset = s.cash + pv;
+                const startPrice = s.history[0]?.price || 1000;
+                const growth = s.stockPrice - startPrice;
+                const growthPct = startPrice > 0 ? ((growth / startPrice) * 100).toFixed(0) : 0;
+                return (
+                  <div key={s.id} style={{ display: "grid", gridTemplateColumns: isMobile ? "1.5fr 0.8fr 0.8fr 0.8fr 1fr" : "2fr 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr", gap: 4, padding: "8px", borderBottom: "1px solid rgba(120,140,255,0.04)", alignItems: "center", minWidth: isMobile ? 500 : "auto" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <span style={{ fontSize: 18 }}>{s.emoji}</span>
+                      <div>
+                        <div style={{ fontSize: 12, color: "#ccd", fontWeight: 600 }}>{s.name}</div>
+                        <div style={{ fontSize: 10, color: "#556" }}>{s.company}</div>
+                      </div>
+                    </div>
+                    <span style={{ textAlign: "center", fontSize: 12, color: myTrades > 0 ? "#80cbc4" : "#556" }}>{myTrades}건</span>
+                    <span style={{ textAlign: "center", fontSize: 12, color: myTickets > 0 ? "#ffab40" : "#556" }}>{myTickets}장</span>
+                    <span style={{ textAlign: "center", fontSize: 12, color: investCount > 0 ? "#b388ff" : "#556" }}>{investCount}개</span>
+                    {!isMobile && <span style={{ textAlign: "center", fontSize: 12, color: investorCount > 0 ? "#f48fb1" : "#556" }}>{investorCount}명</span>}
+                    {!isMobile && <span style={{ textAlign: "center", fontSize: 12, fontWeight: 600, color: growth >= 0 ? "#4cdf8b" : "#ff6b7a" }}>{growth >= 0 ? "+" : ""}{growthPct}%</span>}
+                    <span style={{ textAlign: "center", fontSize: 12, fontWeight: 700, color: "#ffd740" }}>{totalAsset.toLocaleString()}원</span>
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 12 }}>
+            <Card>
+              <h4 style={{ margin: "0 0 12px", fontSize: 14, color: "#9cb8ff" }}>🏆 주가 상승률 TOP</h4>
+              {[...students].sort((a, b) => {
+                const aGrowth = (a.stockPrice - (a.history[0]?.price || 1000)) / (a.history[0]?.price || 1000);
+                const bGrowth = (b.stockPrice - (b.history[0]?.price || 1000)) / (b.history[0]?.price || 1000);
+                return bGrowth - aGrowth;
+              }).slice(0, 5).map((s, i) => {
+                const startP = s.history[0]?.price || 1000;
+                const growthPct = ((s.stockPrice - startP) / startP * 100).toFixed(1);
+                return (
+                  <div key={s.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid rgba(120,140,255,0.04)" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: "#556", width: 18 }}>{i + 1}</span>
+                      <span style={{ fontSize: 16 }}>{s.emoji}</span>
+                      <span style={{ fontSize: 12, color: "#ccd" }}>{s.name}</span>
+                    </div>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: growthPct >= 0 ? "#4cdf8b" : "#ff6b7a" }}>{growthPct > 0 ? "+" : ""}{growthPct}%</span>
+                  </div>
+                );
+              })}
+            </Card>
+            <Card>
+              <h4 style={{ margin: "0 0 12px", fontSize: 14, color: "#9cb8ff" }}>💰 총자산 TOP</h4>
+              {[...students].sort((a, b) => {
+                return (b.cash + portfolioVal(b.portfolio, students)) - (a.cash + portfolioVal(a.portfolio, students));
+              }).slice(0, 5).map((s, i) => {
+                const totalAsset = s.cash + portfolioVal(s.portfolio, students);
+                return (
+                  <div key={s.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid rgba(120,140,255,0.04)" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: "#556", width: 18 }}>{i + 1}</span>
+                      <span style={{ fontSize: 16 }}>{s.emoji}</span>
+                      <span style={{ fontSize: 12, color: "#ccd" }}>{s.name}</span>
+                    </div>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: "#ffd740" }}>{totalAsset.toLocaleString()}원</span>
+                  </div>
+                );
+              })}
+            </Card>
+          </div>
+        </div>
+      )}
+
       {sub === "manage" && (
         <Card>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: isMobile ? "flex-start" : "center", marginBottom: 16, flexDirection: isMobile ? "column" : "row", gap: isMobile ? 10 : 0 }}>
             <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: "#9cb8ff" }}>👥 학생 관��</h3>
             <div style={{ display: "flex", gap: 8 }}>
               <button onClick={() => { if (window.confirm("예시 데이터(8명)를 불러올까요?")) { loadSample(); window.alert("예시 데이터를 불러왔습니다!"); } }} style={{ display: "flex", alignItems: "center", gap: 4, padding: "8px 14px", background: "rgba(255,171,64,0.1)", border: "1px solid rgba(255,171,64,0.2)", borderRadius: 8, color: "#ffab40", cursor: "pointer", fontSize: 12, fontWeight: 600 }}><Sparkles size={14} /> 예시 데이터</button>
@@ -407,9 +629,9 @@ export default function Admin() {
               <div style={{ fontSize: 13, color: "#e0e6ff" }}>미션 S: <b>300원</b> / A: <b>200원</b> / B: <b>100원</b></div>
             </div>
           </div>
-          <div style={{ background: "rgba(100,130,255,0.04)", borderRadius: 12, padding: 16, marginBottom: 20, border: "1px solid rgba(120,140,255,0.08)" }}>
+          <div className="settle-preview" style={{ background: "rgba(100,130,255,0.04)", borderRadius: 12, padding: 16, marginBottom: 20, border: "1px solid rgba(120,140,255,0.08)", overflowX: "auto" }}>
             <h4 style={{ margin: "0 0 12px", fontSize: 13, color: "#b388ff" }}>정산 미리보기</h4>
-            <div style={{ display: "grid", gridTemplateColumns: "1.8fr 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr", gap: 4, fontSize: 10, color: "#778", marginBottom: 6, padding: "0 8px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1.8fr 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr", gap: 4, fontSize: 10, color: "#778", marginBottom: 6, padding: "0 8px", minWidth: isMobile ? 600 : "auto" }}>
               <span>학생</span><span style={{ textAlign: "center" }}>포인트</span><span style={{ textAlign: "center" }}>미션</span><span style={{ textAlign: "center" }}>투표</span><span style={{ textAlign: "center" }}>주가변동</span><span style={{ textAlign: "center" }}>급여</span><span style={{ textAlign: "center" }}>사업수익</span><span style={{ textAlign: "center" }}>현금수입</span>
             </div>
             {students.map(s => {
@@ -426,7 +648,7 @@ export default function Admin() {
               const bizIncome = MISSION_CASH[s.mg] || 0;
               const cashTotal = salary + bizIncome;
               return (
-                <div key={s.id} style={{ display: "grid", gridTemplateColumns: "1.8fr 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr", gap: 4, padding: "8px", borderBottom: "1px solid rgba(120,140,255,0.04)", alignItems: "center" }}>
+                <div key={s.id} style={{ display: "grid", gridTemplateColumns: "1.8fr 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr", gap: 4, padding: "8px", borderBottom: "1px solid rgba(120,140,255,0.04)", alignItems: "center", minWidth: isMobile ? 600 : "auto" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 6 }}><span>{s.emoji}</span><span style={{ fontSize: 12, color: "#ccd" }}>{s.name}</span></div>
                   <span style={{ textAlign: "center", fontSize: 11, color: (s.tp || 0) >= 0 ? "#4cdf8b" : "#ff6b7a" }}>{(s.tp || 0) >= 0 ? "+" : ""}{s.tp || 0}</span>
                   <span style={{ textAlign: "center", fontSize: 11, color: s.mg ? (mb >= 0 ? "#80cbc4" : "#ff6b7a") : "#556" }}>{s.mg || "-"}</span>

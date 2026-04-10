@@ -7,13 +7,13 @@ import Stat from "./Stat";
 const colors = ["#7c9eff", "#b388ff", "#80cbc4", "#ffab40", "#ff8a80", "#a5d6a7", "#f48fb1", "#81d4fa", "#ffe082", "#ce93d8"];
 
 export default function Dashboard() {
-  const { students, txs, week, setSelStudent: onSel } = useApp();
+  const { students, txs, week, setSelStudent: onSel, isMobile } = useApp();
   const sorted = [...students].sort((a, b) => b.stockPrice - a.stockPrice);
   const avg = Math.round(students.reduce((s, x) => s + x.stockPrice, 0) / (students.length || 1));
 
   return (
     <div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12, marginBottom: 24 }}>
+      <div className="stat-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12, marginBottom: 24 }}>
         <Stat icon={<Building2 size={18} />} label="상장 기업" value={`${students.length}개`} color="#7c9eff" />
         <Stat icon={<BarChart3 size={18} />} label="평균 주가" value={`${avg.toLocaleString()}원`} color="#b388ff" />
         <Stat icon={<TrendingUp size={18} />} label="총 거래" value={`${txs.length}건`} color="#80cbc4" />
@@ -22,12 +22,12 @@ export default function Dashboard() {
 
       <Card style={{ marginBottom: 24 }}>
         <h3 style={{ margin: "0 0 14px", fontSize: 15, fontWeight: 600, color: "#9cb8ff" }}>📈 전체 주가 추이</h3>
-        <div style={{ height: 200 }}>
+        <div style={{ height: isMobile ? 160 : 200 }}>
           <ResponsiveContainer>
             <LineChart>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(120,140,255,0.08)" />
-              <XAxis dataKey="label" type="category" allowDuplicatedCategory={false} tick={{ fill: "#666", fontSize: 11 }} />
-              <YAxis tick={{ fill: "#666", fontSize: 11 }} />
+              <XAxis dataKey="label" type="category" allowDuplicatedCategory={false} tick={{ fill: "#666", fontSize: isMobile ? 10 : 11 }} />
+              <YAxis tick={{ fill: "#666", fontSize: isMobile ? 10 : 11 }} width={isMobile ? 35 : 60} />
               <Tooltip contentStyle={{ background: "#1a2240", border: "1px solid rgba(120,140,255,0.2)", borderRadius: 8, color: "#ddd", fontSize: 12 }} />
               {students.map((s, i) => (
                 <Line key={s.id} data={s.history} dataKey="price" name={s.company} stroke={colors[i % colors.length]} strokeWidth={2} dot={false} />
@@ -38,7 +38,7 @@ export default function Dashboard() {
       </Card>
 
       <h3 style={{ margin: "0 0 14px", fontSize: 15, fontWeight: 600, color: "#9cb8ff" }}>🏢 전체 종목</h3>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))", gap: 12 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill, minmax(250px, 1fr))", gap: isMobile ? 10 : 12 }}>
         {sorted.map((s, i) => {
           const h = s.history;
           const prev = h.length > 1 ? h[h.length - 2].price : h[0].price;
@@ -50,27 +50,39 @@ export default function Dashboard() {
               {i < 3 && <div style={{ position: "absolute", top: 8, right: 10, fontSize: 10, background: i === 0 ? "rgba(255,215,0,0.15)" : "rgba(180,180,180,0.1)", color: i === 0 ? "#ffd700" : "#aaa", padding: "2px 8px", borderRadius: 10 }}>{["👑1위","🥈2위","🥉3위"][i]}</div>}
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
                 <div style={{ fontSize: 28 }}>{s.emoji}</div>
-                <div>
+                <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: 700, fontSize: 14, color: "#e0e6ff" }}>{s.company}</div>
                   <div style={{ fontSize: 11, color: "#667" }}>CEO {s.name}</div>
                 </div>
+                {isMobile && (
+                  <div style={{ textAlign: "right" }}>
+                    <div style={{ fontSize: 18, fontWeight: 800, color: "#fff" }}>{s.stockPrice.toLocaleString()}<span style={{ fontSize: 11, color: "#778" }}>원</span></div>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: up ? "#4cdf8b" : "#ff6b7a" }}>
+                      {up ? "+" : ""}{ch} ({pct}%)
+                    </span>
+                  </div>
+                )}
               </div>
-              <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 8 }}>
-                <span style={{ fontSize: 22, fontWeight: 800, color: "#fff" }}>{s.stockPrice.toLocaleString()}</span>
-                <span style={{ fontSize: 12, color: "#778" }}>원</span>
-                <span style={{ fontSize: 13, fontWeight: 600, color: up ? "#4cdf8b" : "#ff6b7a", display: "flex", alignItems: "center", gap: 2 }}>
-                  {up ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
-                  {up ? "+" : ""}{ch} ({pct}%)
-                </span>
-              </div>
-              <div style={{ height: 40 }}>
-                <ResponsiveContainer>
-                  <AreaChart data={h.slice(-8)}>
-                    <defs><linearGradient id={`g${s.id}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={up ? "#4cdf8b" : "#ff6b7a"} stopOpacity={0.3} /><stop offset="100%" stopColor={up ? "#4cdf8b" : "#ff6b7a"} stopOpacity={0} /></linearGradient></defs>
-                    <Area dataKey="price" stroke={up ? "#4cdf8b" : "#ff6b7a"} fill={`url(#g${s.id})`} strokeWidth={2} dot={false} />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
+              {!isMobile && (
+                <>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 8 }}>
+                    <span style={{ fontSize: 22, fontWeight: 800, color: "#fff" }}>{s.stockPrice.toLocaleString()}</span>
+                    <span style={{ fontSize: 12, color: "#778" }}>원</span>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: up ? "#4cdf8b" : "#ff6b7a", display: "flex", alignItems: "center", gap: 2 }}>
+                      {up ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
+                      {up ? "+" : ""}{ch} ({pct}%)
+                    </span>
+                  </div>
+                  <div style={{ height: 40 }}>
+                    <ResponsiveContainer>
+                      <AreaChart data={h.slice(-8)}>
+                        <defs><linearGradient id={`g${s.id}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={up ? "#4cdf8b" : "#ff6b7a"} stopOpacity={0.3} /><stop offset="100%" stopColor={up ? "#4cdf8b" : "#ff6b7a"} stopOpacity={0} /></linearGradient></defs>
+                        <Area dataKey="price" stroke={up ? "#4cdf8b" : "#ff6b7a"} fill={`url(#g${s.id})`} strokeWidth={2} dot={false} />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                </>
+              )}
             </Card>
           );
         })}

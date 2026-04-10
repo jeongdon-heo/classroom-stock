@@ -6,7 +6,7 @@ import { ss, si, qb } from "../styles";
 import Card from "./Card";
 
 export default function Trade() {
-  const { students, doTrade, txs } = useApp();
+  const { students, doTrade, txs, isMobile } = useApp();
   const [buyer, setBuyer] = useState("");
   const [co, setCo] = useState("");
   const [sh, setSh] = useState(1);
@@ -25,7 +25,7 @@ export default function Trade() {
   function flash(t, txt) { setMsg({ t, txt }); setTimeout(() => setMsg(null), 3000); }
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+    <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 16 : 20 }}>
       <Card>
         <h3 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 600, color: "#9cb8ff" }}>💰 주식 거래</h3>
         {msg && <div style={{ padding: "10px 14px", borderRadius: 10, marginBottom: 14, background: msg.t === "success" ? "rgba(76,223,139,0.1)" : "rgba(255,107,122,0.1)", border: `1px solid ${msg.t === "success" ? "rgba(76,223,139,0.3)" : "rgba(255,107,122,0.3)"}`, color: msg.t === "success" ? "#4cdf8b" : "#ff6b7a", fontSize: 13 }}>{msg.txt}</div>}
@@ -75,7 +75,7 @@ export default function Trade() {
 
       <Card>
         <h3 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 600, color: "#9cb8ff" }}>📋 거래 기록</h3>
-        <div style={{ maxHeight: 450, overflow: "auto" }}>
+        <div style={{ maxHeight: isMobile ? 300 : 450, overflow: "auto" }}>
           {txs.length === 0 ? <div style={{ textAlign: "center", padding: 40, color: "#556" }}>거래 기록 없음</div> :
             txs.slice(0, 30).map(t => (
               <div key={t.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 10px", borderBottom: "1px solid rgba(120,140,255,0.06)", fontSize: 13 }}>
