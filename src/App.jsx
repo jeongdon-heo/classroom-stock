@@ -72,12 +72,7 @@ export default function App() {
   }, []);
 
   function initEmpty() {
-    setStudents([]);
-    setTxs([]);
-    setWeek(1);
-    setMission("");
-    setEvts([]);
-    setTicketLog([]);
+    setStudents([]); setTxs([]); setWeek(1); setMission(""); setEvts([]); setTicketLog([]);
     save([], [], 1, "", [], []);
   }
 
@@ -88,12 +83,7 @@ export default function App() {
       cash: DEFAULT_CASH, portfolio: [],
       tp: 0, mg: "", pv: 0, lastSalary: 0, lastBiz: 0,
     }));
-    setStudents(init);
-    setTxs([]);
-    setWeek(1);
-    setMission("독서록 3편 작성하기");
-    setEvts([]);
-    setTicketLog([]);
+    setStudents(init); setTxs([]); setWeek(1); setMission("독서록 3편 작성하기"); setEvts([]); setTicketLog([]);
     save(init, [], 1, "독서록 3편 작성하기", [], []);
   }
 
@@ -169,19 +159,15 @@ export default function App() {
 
   function resetAll() {
     if (!window.confirm("모든 데이터를 초기화합니까?")) return;
-    try {
-      initEmpty();
-      window.alert("초기화가 완료되었습니다!");
-    } catch (err) {
-      window.alert("초기화 오류: " + err.message);
-    }
+    try { initEmpty(); window.alert("초기화가 완료되었습니다!"); }
+    catch (err) { window.alert("초기화 오류: " + err.message); }
   }
 
   const isMobile = useIsMobile();
 
   if (loading) return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", background: "#0a0e1a", color: "#f0f0f0", fontFamily: "'Noto Sans KR', sans-serif" }}>
-      <div style={{ textAlign: "center" }}><div style={{ fontSize: 48, marginBottom: 16 }}>📈</div><div style={{ fontSize: 18, opacity: 0.8 }}>로딩중...</div></div>
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", background: "#f0f4ff", color: "#1e293b", fontFamily: "'Noto Sans KR', sans-serif" }}>
+      <div style={{ textAlign: "center" }}><div style={{ fontSize: 48, marginBottom: 16 }}>📈</div><div style={{ fontSize: 18, color: "#6366f1", fontWeight: 600 }}>로딩중...</div></div>
     </div>
   );
 
@@ -204,26 +190,26 @@ export default function App() {
 
   return (
     <AppContext.Provider value={ctx}>
-    <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #0a0e1a 0%, #121832 50%, #0d1525 100%)", color: "#e8eaf6", fontFamily: "'Noto Sans KR', -apple-system, sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "#f0f4ff", color: "#1e293b", fontFamily: "'Noto Sans KR', -apple-system, sans-serif" }}>
       <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&family=Black+Han+Sans&display=swap" rel="stylesheet" />
 
-      <header style={{ background: "linear-gradient(90deg, rgba(30,60,180,0.3), rgba(120,40,200,0.2), rgba(30,60,180,0.3))", borderBottom: "1px solid rgba(120,140,255,0.15)", padding: isMobile ? "10px 14px" : "14px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100, backdropFilter: "blur(20px)" }}>
+      <header style={{ background: "linear-gradient(135deg, #6366f1, #8b5cf6, #a78bfa)", borderBottom: "1px solid #e2e8f0", padding: isMobile ? "10px 14px" : "14px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100, boxShadow: "0 2px 8px rgba(99,102,241,0.15)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 8 : 12 }}>
           <div style={{ fontSize: isMobile ? 24 : 28 }}>🏢</div>
           <div>
-            <h1 style={{ margin: 0, fontSize: isMobile ? 17 : 20, fontFamily: "'Black Han Sans', sans-serif", background: "linear-gradient(90deg, #7c9eff, #b388ff, #82b1ff)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", letterSpacing: 1 }}>4-2 주식회사</h1>
-            <div style={{ fontSize: 11, opacity: 0.5, marginTop: 1 }}>{week}주차 · {students.length}명</div>
+            <h1 style={{ margin: 0, fontSize: isMobile ? 17 : 20, fontFamily: "'Black Han Sans', sans-serif", color: "#ffffff", letterSpacing: 1 }}>4-2 주식회사</h1>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.7)", marginTop: 1 }}>{week}주차 · {students.length}명</div>
           </div>
         </div>
-        <div style={{ background: "rgba(100,255,150,0.08)", border: "1px solid rgba(100,255,150,0.15)", borderRadius: 20, padding: "4px 12px", fontSize: isMobile ? 11 : 12, color: "#80ffaa", maxWidth: isMobile ? 150 : 220, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+        <div style={{ background: "rgba(255,255,255,0.2)", borderRadius: 20, padding: "4px 12px", fontSize: isMobile ? 11 : 12, color: "#ffffff", maxWidth: isMobile ? 150 : 220, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
           📋 {mission || "미션 미설정"}
         </div>
       </header>
 
       {/* 데스크톱 상단 탭 */}
-      <nav className="desktop-nav" style={{ display: "flex", gap: 2, padding: "10px 20px 0", borderBottom: "1px solid rgba(120,140,255,0.08)", overflowX: "auto" }}>
+      <nav className="desktop-nav" style={{ display: "flex", gap: 2, padding: "10px 20px 0", background: "#ffffff", borderBottom: "1px solid #e8ecf4", overflowX: "auto" }}>
         {tabs.map(t => (
-          <button key={t.id} onClick={() => setTab(t.id)} style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 16px", background: tab === t.id ? "rgba(100,130,255,0.15)" : "transparent", border: "none", borderBottom: tab === t.id ? "2px solid #7c9eff" : "2px solid transparent", color: tab === t.id ? "#9cb8ff" : "rgba(200,210,240,0.5)", cursor: "pointer", fontSize: 14, fontWeight: tab === t.id ? 600 : 400, borderRadius: "8px 8px 0 0", transition: "all 0.2s", whiteSpace: "nowrap" }}>
+          <button key={t.id} onClick={() => setTab(t.id)} style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 16px", background: tab === t.id ? "#f0f0ff" : "transparent", border: "none", borderBottom: tab === t.id ? "2px solid #6366f1" : "2px solid transparent", color: tab === t.id ? "#6366f1" : "#94a3b8", cursor: "pointer", fontSize: 14, fontWeight: tab === t.id ? 600 : 400, borderRadius: "8px 8px 0 0", transition: "all 0.2s", whiteSpace: "nowrap" }}>
             {t.icon} {t.label}
           </button>
         ))}
@@ -237,9 +223,9 @@ export default function App() {
       </main>
 
       {/* 모바일 하단 탭바 */}
-      <nav className="mobile-bottom-nav" style={{ display: "none", position: "fixed", bottom: 0, left: 0, right: 0, background: "rgba(10,14,26,0.95)", borderTop: "1px solid rgba(120,140,255,0.15)", backdropFilter: "blur(20px)", zIndex: 100, padding: "6px 0 env(safe-area-inset-bottom, 6px)" }}>
+      <nav className="mobile-bottom-nav" style={{ display: "none", position: "fixed", bottom: 0, left: 0, right: 0, background: "rgba(255,255,255,0.95)", borderTop: "1px solid #e8ecf4", backdropFilter: "blur(20px)", zIndex: 100, padding: "6px 0 env(safe-area-inset-bottom, 6px)", boxShadow: "0 -2px 8px rgba(0,0,0,0.05)" }}>
         {tabs.map(t => (
-          <button key={t.id} onClick={() => setTab(t.id)} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 3, padding: "8px 0", background: "none", border: "none", color: tab === t.id ? "#9cb8ff" : "rgba(200,210,240,0.4)", cursor: "pointer", fontSize: 10, fontWeight: tab === t.id ? 700 : 400, transition: "color 0.2s" }}>
+          <button key={t.id} onClick={() => setTab(t.id)} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 3, padding: "8px 0", background: "none", border: "none", color: tab === t.id ? "#6366f1" : "#94a3b8", cursor: "pointer", fontSize: 10, fontWeight: tab === t.id ? 700 : 400, transition: "color 0.2s" }}>
             <span style={{ transform: tab === t.id ? "scale(1.15)" : "scale(1)", transition: "transform 0.2s" }}>{t.icon}</span>
             {t.label}
           </button>

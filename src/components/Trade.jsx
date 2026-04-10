@@ -27,12 +27,12 @@ export default function Trade() {
   return (
     <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 16 : 20 }}>
       <Card>
-        <h3 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 600, color: "#9cb8ff" }}>💰 주식 거래</h3>
-        {msg && <div style={{ padding: "10px 14px", borderRadius: 10, marginBottom: 14, background: msg.t === "success" ? "rgba(76,223,139,0.1)" : "rgba(255,107,122,0.1)", border: `1px solid ${msg.t === "success" ? "rgba(76,223,139,0.3)" : "rgba(255,107,122,0.3)"}`, color: msg.t === "success" ? "#4cdf8b" : "#ff6b7a", fontSize: 13 }}>{msg.txt}</div>}
+        <h3 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 600, color: "#4f46e5" }}>💰 주식 거래</h3>
+        {msg && <div style={{ padding: "10px 14px", borderRadius: 10, marginBottom: 14, background: msg.t === "success" ? "#f0fdf4" : "#fef2f2", border: `1px solid ${msg.t === "success" ? "#bbf7d0" : "#fecaca"}`, color: msg.t === "success" ? "#16a34a" : "#dc2626", fontSize: 13 }}>{msg.txt}</div>}
 
         <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
           {["buy", "sell"].map(t => (
-            <button key={t} onClick={() => setType(t)} style={{ flex: 1, padding: "10px", background: type === t ? (t === "buy" ? "rgba(76,223,139,0.15)" : "rgba(255,107,122,0.15)") : "rgba(100,130,255,0.05)", border: `1px solid ${type === t ? (t === "buy" ? "rgba(76,223,139,0.4)" : "rgba(255,107,122,0.4)") : "rgba(120,140,255,0.1)"}`, borderRadius: 10, color: type === t ? (t === "buy" ? "#4cdf8b" : "#ff6b7a") : "#778", cursor: "pointer", fontSize: 14, fontWeight: 600 }}>
+            <button key={t} onClick={() => setType(t)} style={{ flex: 1, padding: "10px", background: type === t ? (t === "buy" ? "#f0fdf4" : "#fef2f2") : "#f8fafc", border: `1px solid ${type === t ? (t === "buy" ? "#86efac" : "#fca5a5") : "#e2e8f0"}`, borderRadius: 10, color: type === t ? (t === "buy" ? "#16a34a" : "#dc2626") : "#94a3b8", cursor: "pointer", fontSize: 14, fontWeight: 600 }}>
               {t === "buy" ? "📈 매수" : "📉 매도"}
             </button>
           ))}
@@ -56,36 +56,36 @@ export default function Trade() {
         <label style={ss}>수량</label>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
           <button onClick={() => setSh(Math.max(1, sh - 1))} style={qb}><Minus size={14} /></button>
-          <span style={{ fontSize: 20, fontWeight: 800, minWidth: 30, textAlign: "center" }}>{sh}</span>
+          <span style={{ fontSize: 20, fontWeight: 800, minWidth: 30, textAlign: "center", color: "#1e293b" }}>{sh}</span>
           <button onClick={() => setSh(Math.min(MAX_SHARES, sh + 1))} style={qb}><Plus size={14} /></button>
-          <span style={{ fontSize: 12, color: "#778" }}>(최대 {MAX_SHARES}주)</span>
+          <span style={{ fontSize: 12, color: "#94a3b8" }}>(최대 {MAX_SHARES}주)</span>
         </div>
 
         {c && (
-          <div style={{ background: "rgba(100,130,255,0.05)", borderRadius: 10, padding: 12, marginBottom: 14, fontSize: 13 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}><span style={{ color: "#778" }}>주당</span><span>{c.stockPrice.toLocaleString()}원</span></div>
-            <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 700, fontSize: 15 }}><span style={{ color: "#778" }}>총액</span><span style={{ color: type === "buy" ? "#ff6b7a" : "#4cdf8b" }}>{(c.stockPrice * sh).toLocaleString()}원</span></div>
+          <div style={{ background: "#f8fafc", borderRadius: 10, padding: 12, marginBottom: 14, fontSize: 13, border: "1px solid #e2e8f0" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}><span style={{ color: "#64748b" }}>주당</span><span style={{ color: "#1e293b" }}>{c.stockPrice.toLocaleString()}원</span></div>
+            <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 700, fontSize: 15 }}><span style={{ color: "#64748b" }}>총액</span><span style={{ color: type === "buy" ? "#dc2626" : "#16a34a" }}>{(c.stockPrice * sh).toLocaleString()}원</span></div>
           </div>
         )}
 
-        <button onClick={go} style={{ width: "100%", padding: 14, background: type === "buy" ? "linear-gradient(135deg, #2e7d32, #43a047)" : "linear-gradient(135deg, #c62828, #e53935)", border: "none", borderRadius: 12, color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer" }}>
+        <button onClick={go} style={{ width: "100%", padding: 14, background: type === "buy" ? "linear-gradient(135deg, #16a34a, #22c55e)" : "linear-gradient(135deg, #dc2626, #ef4444)", border: "none", borderRadius: 12, color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer" }}>
           {type === "buy" ? "매수하기" : "매도하기"}
         </button>
       </Card>
 
       <Card>
-        <h3 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 600, color: "#9cb8ff" }}>📋 거래 기록</h3>
+        <h3 style={{ margin: "0 0 16px", fontSize: 15, fontWeight: 600, color: "#4f46e5" }}>📋 거래 기록</h3>
         <div style={{ maxHeight: isMobile ? 300 : 450, overflow: "auto" }}>
-          {txs.length === 0 ? <div style={{ textAlign: "center", padding: 40, color: "#556" }}>거래 기록 없음</div> :
+          {txs.length === 0 ? <div style={{ textAlign: "center", padding: 40, color: "#94a3b8" }}>거래 기록 없음</div> :
             txs.slice(0, 30).map(t => (
-              <div key={t.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 10px", borderBottom: "1px solid rgba(120,140,255,0.06)", fontSize: 13 }}>
+              <div key={t.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 10px", borderBottom: "1px solid #f1f5f9", fontSize: 13 }}>
                 <div>
-                  <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: 6, fontSize: 11, fontWeight: 600, background: t.type === "buy" ? "rgba(76,223,139,0.1)" : "rgba(255,107,122,0.1)", color: t.type === "buy" ? "#4cdf8b" : "#ff6b7a", marginRight: 6 }}>{t.type === "buy" ? "매수" : "매도"}</span>
-                  <span style={{ color: "#ccd" }}>{t.bn}</span><span style={{ color: "#556", margin: "0 3px" }}>→</span><span style={{ color: "#9cb8ff" }}>{t.cn}</span>
+                  <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: 6, fontSize: 11, fontWeight: 600, background: t.type === "buy" ? "#f0fdf4" : "#fef2f2", color: t.type === "buy" ? "#16a34a" : "#dc2626", marginRight: 6 }}>{t.type === "buy" ? "매수" : "매도"}</span>
+                  <span style={{ color: "#1e293b" }}>{t.bn}</span><span style={{ color: "#94a3b8", margin: "0 3px" }}>→</span><span style={{ color: "#6366f1" }}>{t.cn}</span>
                 </div>
                 <div style={{ textAlign: "right" }}>
-                  <div style={{ fontWeight: 600 }}>{t.sh}주 × {t.price.toLocaleString()}원</div>
-                  <div style={{ fontSize: 10, color: "#556" }}>{t.date}</div>
+                  <div style={{ fontWeight: 600, color: "#1e293b" }}>{t.sh}주 × {t.price.toLocaleString()}원</div>
+                  <div style={{ fontSize: 10, color: "#94a3b8" }}>{t.date}</div>
                 </div>
               </div>
             ))}

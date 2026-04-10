@@ -1,30 +1,26 @@
 /* 전역 기본 설정 */
 * { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; overflow-x: hidden; }
+html, body { margin: 0; padding: 0; overflow-x: hidden; background: #f0f4ff; }
 
 /* 스크롤바 스타일링 */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(120,140,255,0.2); border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.2); border-radius: 3px; }
 
 /* 모바일 전용 */
 @media (max-width: 768px) {
-  /* 하단 네비 공간 확보 */
   .app-main {
     padding-bottom: 72px !important;
   }
 
-  /* 데스크톱 탑 네비 숨김 */
   .desktop-nav {
     display: none !important;
   }
 
-  /* 하단 네비 표시 */
   .mobile-bottom-nav {
     display: flex !important;
   }
 
-  /* Admin 서브탭 가로 스크롤 */
   .admin-subtabs {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -33,14 +29,12 @@ html, body { margin: 0; padding: 0; overflow-x: hidden; }
   }
   .admin-subtabs::-webkit-scrollbar { display: none; }
 
-  /* 정산 미리보기 가로 스크롤 */
   .settle-preview {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
   .settle-preview::-webkit-scrollbar { display: none; }
 
-  /* 카드 패딩 축소 */
   .stat-grid {
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 8px !important;
