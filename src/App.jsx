@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, lazy, Suspense } from "react";
 import { BarChart3, ShoppingCart, Trophy, Settings } from "lucide-react";
 import { db } from "./firebase";
 import { doc, getDocFromCache, getDocFromServer, setDoc } from "firebase/firestore";
@@ -6,12 +6,13 @@ import { AppContext } from "./context/AppContext";
 import { SAMPLE_STUDENTS, DEFAULT_STOCK_PRICE, DEFAULT_CASH, GRADES, SALARY_RATE, MISSION_CASH, MAX_SHARES } from "./constants";
 import { uid } from "./utils";
 import useIsMobile from "./hooks/useIsMobile";
-import Dashboard from "./components/Dashboard";
-import Trade from "./components/Trade";
-import Ranking from "./components/Ranking";
-import Admin from "./components/Admin";
-import Detail from "./components/Detail";
 import Modal from "./components/Modal";
+
+const Dashboard = lazy(() => import("./components/Dashboard"));
+const Trade = lazy(() => import("./components/Trade"));
+const Ranking = lazy(() => import("./components/Ranking"));
+const Admin = lazy(() => import("./components/Admin"));
+const Detail = lazy(() => import("./components/Detail"));
 
 export default function App() {
   const [loading, setLoading] = useState(true);
@@ -217,10 +218,12 @@ export default function App() {
       </nav>
 
       <main className="app-main" style={{ padding: isMobile ? "14px" : "20px", maxWidth: 1100, margin: "0 auto" }}>
-        {tab === "dashboard" && <Dashboard />}
-        {tab === "trade" && <Trade />}
-        {tab === "ranking" && <Ranking />}
-        {tab === "admin" && isAdmin && <Admin />}
+        <Suspense fallback={<div style={{ padding: 40, textAlign: "center", color: "#6366f1", fontSize: 14 }}>불러오는 중...</div>}>
+          {tab === "dashboard" && <Dashboard />}
+          {tab === "trade" && <Trade />}
+          {tab === "ranking" && <Ranking />}
+          {tab === "admin" && isAdmin && <Admin />}
+        </Suspense>
       </main>
 
       {/* 모바일 하단 탭바 */}
@@ -233,7 +236,7 @@ export default function App() {
         ))}
       </nav>
 
-      {selStudent && <Modal onClose={() => setSelStudent(null)}><Detail s={students.find(x => x.id === selStudent)} /></Modal>}
+      {selStudent && <Modal onClose={() => setSelStudent(null)}><Suspense fallback={<div style={{ padding: 40, textAlign: "center", color: "#6366f1" }}>불러오는 중...</div>}><Detail s={students.find(x => x.id === selStudent)} /></Suspense></Modal>}
     </div>
     </AppContext.Provider>
   );
