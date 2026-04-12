@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, lazy, Suspense } from "react";
-import { BarChart3, ShoppingCart, Trophy, Settings } from "lucide-react";
+import { BarChart3, ShoppingCart, Trophy, Settings, BookOpen } from "lucide-react";
 import { db } from "./firebase";
 import { doc, getDocFromCache, getDocFromServer, setDoc } from "firebase/firestore";
 import { AppContext } from "./context/AppContext";
@@ -11,6 +11,7 @@ import Modal from "./components/Modal";
 const Dashboard = lazy(() => import("./components/Dashboard"));
 const Trade = lazy(() => import("./components/Trade"));
 const Ranking = lazy(() => import("./components/Ranking"));
+const Manual = lazy(() => import("./components/Manual"));
 const Admin = lazy(() => import("./components/Admin"));
 const Detail = lazy(() => import("./components/Detail"));
 
@@ -177,6 +178,7 @@ export default function App() {
     { id: "dashboard", label: "대시보드", icon: <BarChart3 size={18} /> },
     { id: "trade", label: "거래소", icon: <ShoppingCart size={18} /> },
     { id: "ranking", label: "순위표", icon: <Trophy size={18} /> },
+    { id: "manual", label: "매뉴얼", icon: <BookOpen size={18} /> },
     ...(isAdmin ? [{ id: "admin", label: "관리자", icon: <Settings size={18} /> }] : []),
   ];
 
@@ -222,6 +224,7 @@ export default function App() {
           {tab === "dashboard" && <Dashboard />}
           {tab === "trade" && <Trade />}
           {tab === "ranking" && <Ranking />}
+          {tab === "manual" && <Manual />}
           {tab === "admin" && isAdmin && <Admin />}
         </Suspense>
       </main>
