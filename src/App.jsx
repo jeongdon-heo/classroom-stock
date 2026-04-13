@@ -15,6 +15,7 @@ const Manual = lazy(() => import("./components/Manual"));
 const Rewards = lazy(() => import("./components/Rewards"));
 const Admin = lazy(() => import("./components/Admin"));
 const Detail = lazy(() => import("./components/Detail"));
+const StudentLogin = lazy(() => import("./components/StudentLogin"));
 
 export default function App() {
   const [loading, setLoading] = useState(true);
@@ -28,6 +29,19 @@ export default function App() {
   const [showAdd, setShowAdd] = useState(false);
   const [showReport, setShowReport] = useState(false);
   const [ticketLog, setTicketLog] = useState([]);
+  const [myId, setMyIdState] = useState(() => {
+    const v = localStorage.getItem("myStudentId");
+    return v ? Number(v) : null;
+  });
+  const setMyId = useCallback((id) => {
+    if (id === null || id === undefined) {
+      localStorage.removeItem("myStudentId");
+      setMyIdState(null);
+    } else {
+      localStorage.setItem("myStudentId", String(id));
+      setMyIdState(Number(id));
+    }
+  }, []);
 
   const save = useCallback(async (s, t, w, m, e, tl) => {
     try {
@@ -168,6 +182,13 @@ export default function App() {
 
   const isMobile = useIsMobile();
   const isAdmin = new URLSearchParams(window.location.search).has("admin");
+  const me = myId != null ? students.find(s => s.id === myId) : null;
+
+  useEffect(() => {
+    if (myId != null && students.length > 0 && !students.find(s => s.id === myId)) {
+      setMyId(null);
+    }
+  }, [students, myId, setMyId]);
 
   if (loading) return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", background: "#f0f4ff", color: "#1e293b", fontFamily: "'Noto Sans KR', sans-serif" }}>
@@ -191,7 +212,7 @@ export default function App() {
     persist, portfolioVal, doTrade, settle, resetAll, loadSample,
     showAdd, setShowAdd, showReport, setShowReport,
     ticketLog, saveTickets, selStudent, setSelStudent,
-    isMobile,
+    isMobile, myId, setMyId, isAdmin,
   };
 
   return (
@@ -207,9 +228,15 @@ export default function App() {
             <div style={{ fontSize: 11, color: "rgba(255,255,255,0.7)", marginTop: 1 }}>{week}주차 · {students.length}명</div>
           </div>
         </div>
-        <div style={{ background: "rgba(255,255,255,0.2)", borderRadius: 20, padding: "4px 12px", fontSize: isMobile ? 11 : 12, color: "#ffffff", maxWidth: isMobile ? 150 : 220, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-          📋 {mission || "미션 미설정"}
-        </div>
+        {!isAdmin && me ? (
+          <button onClick={() => { if (window.confirm("내 계정 선택을 해제할까요?")) setMyId(null); }} title="내 계정 전환" style={{ background: "rgba(255,255,255,0.2)", border: "none", borderRadius: 20, padding: "4px 12px", fontSize: isMobile ? 11 : 12, color: "#ffffff", maxWidth: isMobile ? 150 : 220, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", cursor: "pointer" }}>
+            {me.emoji} {me.name} 🔄
+          </button>
+        ) : (
+          <div style={{ background: "rgba(255,255,255,0.2)", borderRadius: 20, padding: "4px 12px", fontSize: isMobile ? 11 : 12, color: "#ffffff", maxWidth: isMobile ? 150 : 220, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            📋 {mission || "미션 미설정"}
+          </div>
+        )}
       </header>
 
       {/* 데스크톱 상단 탭 */}
@@ -243,6 +270,12 @@ export default function App() {
       </nav>
 
       {selStudent && <Modal onClose={() => setSelStudent(null)}><Suspense fallback={<div style={{ padding: 40, textAlign: "center", color: "#6366f1" }}>불러오는 중...</div>}><Detail s={students.find(x => x.id === selStudent)} /></Suspense></Modal>}
+
+      {!isAdmin && myId == null && students.length > 0 && (
+        <Suspense fallback={null}>
+          <StudentLogin students={students} onSelect={setMyId} />
+        </Suspense>
+      )}
     </div>
     </AppContext.Provider>
   );
