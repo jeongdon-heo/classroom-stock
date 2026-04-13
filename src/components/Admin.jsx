@@ -467,7 +467,7 @@ export default function Admin() {
                 return bAsset - aAsset;
               }).map(s => {
                 const myTrades = txs.filter(t => t.bid === s.id).length;
-                const myTickets = ticketLog.filter(l => l.studentId === s.id).reduce((sum, l) => sum + l.tickets, 0);
+                const myTicketNet = ticketLog.filter(l => l.studentId === s.id).reduce((sum, l) => sum + (l.cashAmount || 0), 0);
                 const investCount = s.portfolio.length;
                 const investorCount = students.filter(st => st.id !== s.id && st.portfolio.some(p => p.cid === s.id)).length;
                 const pv = portfolioVal(s.portfolio, students);
@@ -485,7 +485,7 @@ export default function Admin() {
                       </div>
                     </div>
                     <span style={{ textAlign: "center", fontSize: 12, color: myTrades > 0 ? "#14b8a6" : "#94a3b8" }}>{myTrades}건</span>
-                    <span style={{ textAlign: "center", fontSize: 12, color: myTickets > 0 ? "#d97706" : "#94a3b8" }}>{myTickets}장</span>
+                    <span style={{ textAlign: "center", fontSize: 12, color: myTicketNet > 0 ? "#16a34a" : myTicketNet < 0 ? "#dc2626" : "#94a3b8" }}>{myTicketNet !== 0 ? `${myTicketNet > 0 ? "+" : ""}${myTicketNet.toLocaleString()}원` : "-"}</span>
                     <span style={{ textAlign: "center", fontSize: 12, color: investCount > 0 ? "#7c3aed" : "#94a3b8" }}>{investCount}개</span>
                     {!isMobile && <span style={{ textAlign: "center", fontSize: 12, color: investorCount > 0 ? "#ec4899" : "#94a3b8" }}>{investorCount}명</span>}
                     {!isMobile && <span style={{ textAlign: "center", fontSize: 12, fontWeight: 600, color: growth >= 0 ? "#16a34a" : "#dc2626" }}>{growth >= 0 ? "+" : ""}{growthPct}%</span>}
