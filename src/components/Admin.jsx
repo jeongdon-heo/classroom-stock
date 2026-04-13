@@ -43,8 +43,9 @@ export default function Admin() {
     const student = students.find(s => s.id === studentId);
     if (!student) return;
 
-    if (choice === "cash") {
-      setStudents(students.map(s => s.id === studentId ? { ...s, cash: s.cash + cashAmount } : s));
+    const delta = choice === "cash" ? cashAmount : choice === "loss" ? -cashAmount : 0;
+    if (delta !== 0) {
+      setStudents(students.map(s => s.id === studentId ? { ...s, cash: s.cash + delta } : s));
     }
 
     const log = {
@@ -55,7 +56,7 @@ export default function Admin() {
       emoji: reason.emoji,
       tickets: count,
       choice,
-      cashAmount: choice === "cash" ? cashAmount : 0,
+      cashAmount: delta,
       week,
       date: new Date().toLocaleString("ko-KR"),
     };
@@ -82,7 +83,7 @@ export default function Admin() {
   };
 
   const subs = [
-    { id: "ticket", label: "행운권", icon: <Gift size={15} /> },
+    { id: "ticket", label: "행운권 환전", icon: <Gift size={15} /> },
     { id: "points", label: "포인트", icon: <Star size={15} /> },
     { id: "mission", label: "미션", icon: <Target size={15} /> },
     { id: "vote", label: "투표", icon: <Vote size={15} /> },
@@ -109,12 +110,12 @@ export default function Admin() {
       {sub === "ticket" && (
         <div>
           <Card style={{ marginBottom: 16 }}>
-            <h3 style={{ margin: "0 0 4px", fontSize: 15, fontWeight: 600, color: "#4f46e5" }}>🎫 행운권 지급</h3>
-            <p style={{ margin: "0 0 12px", fontSize: 12, color: "#64748b" }}>학생이 실물 행운권 또는 가상 화폐(1장 = {TICKET_VALUE}원) 중 선택합니다.</p>
+            <h3 style={{ margin: "0 0 4px", fontSize: 15, fontWeight: 600, color: "#4f46e5" }}>🎫 행운권 환전</h3>
+            <p style={{ margin: "0 0 12px", fontSize: 12, color: "#64748b" }}>활동으로 받은 실물 행운권을 가상 화폐(1장 = {TICKET_VALUE}원)로 환전합니다. 실수로 환전한 경우 '가상화폐 손실'로 되돌릴 수 있습니다.</p>
 
             {tkMsg && (
-              <div style={{ padding: "12px 16px", borderRadius: 10, marginBottom: 14, background: tkMsg.choice === "cash" ? "#f0fdf4" : "#faf5ff", border: `1px solid ${tkMsg.choice === "cash" ? "#86efac" : "#d8b4fe"}`, color: tkMsg.choice === "cash" ? "#16a34a" : "#7c3aed", fontSize: 13 }}>
-                ✅ {tkMsg.name}에게 행운권 {tkMsg.tickets}장 → {tkMsg.choice === "cash" ? `가상 화폐 +${tkMsg.cash.toLocaleString()}원 전환 완료!` : "실물 행운권 지급 완료!"}
+              <div style={{ padding: "12px 16px", borderRadius: 10, marginBottom: 14, background: tkMsg.choice === "cash" ? "#f0fdf4" : "#fef2f2", border: `1px solid ${tkMsg.choice === "cash" ? "#86efac" : "#fca5a5"}`, color: tkMsg.choice === "cash" ? "#16a34a" : "#dc2626", fontSize: 13 }}>
+                ✅ {tkMsg.name} → {tkMsg.choice === "cash" ? `가상 화폐 +${tkMsg.cash.toLocaleString()}원 환전 완료!` : `가상 화폐 -${tkMsg.cash.toLocaleString()}원 차감 완료!`}
               </div>
             )}
 
@@ -146,8 +147,7 @@ export default function Admin() {
                 const cashVal = count * TICKET_VALUE;
                 const weekLogs = ticketLog.filter(l => l.studentId === s.id && l.week === week);
                 const weekTotal = weekLogs.reduce((sum, l) => sum + l.tickets, 0);
-                const weekCash = weekLogs.filter(l => l.choice === "cash").reduce((sum, l) => sum + l.cashAmount, 0);
-                const weekPhysical = weekLogs.filter(l => l.choice === "physical").reduce((sum, l) => sum + l.tickets, 0);
+                const weekNet = weekLogs.reduce((sum, l) => sum + (l.cashAmount || 0), 0);
 
                 return (
                   <div key={s.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", background: "#f8fafc", borderRadius: 10, border: "1px solid #e8ecf4" }}>
@@ -157,8 +157,7 @@ export default function Admin() {
                         <div style={{ fontWeight: 600, fontSize: 13, color: "#1e293b" }}>{s.name}</div>
                         <div style={{ fontSize: 10, color: "#94a3b8" }}>
                           이번 주: {weekTotal > 0 ? `${weekTotal}장` : "-"}
-                          {weekCash > 0 ? ` (💰${weekCash.toLocaleString()})` : ""}
-                          {weekPhysical > 0 ? ` (🎫${weekPhysical}장)` : ""}
+                          {weekNet !== 0 ? ` (${weekNet > 0 ? "+" : ""}${weekNet.toLocaleString()}원)` : ""}
                         </div>
                       </div>
                     </div>
@@ -167,8 +166,8 @@ export default function Admin() {
                       <button onClick={() => giveTicket(s.id, tkReason, "cash")} style={{ padding: "6px 12px", background: "#f0fdf4", border: "1px solid #86efac", borderRadius: 8, color: "#16a34a", cursor: "pointer", fontSize: 11, fontWeight: 600 }}>
                         💰 가상화폐 (+{cashVal.toLocaleString()}원)
                       </button>
-                      <button onClick={() => giveTicket(s.id, tkReason, "physical")} style={{ padding: "6px 12px", background: "#faf5ff", border: "1px solid #d8b4fe", borderRadius: 8, color: "#7c3aed", cursor: "pointer", fontSize: 11, fontWeight: 600 }}>
-                        🎫 실물 행운권
+                      <button onClick={() => giveTicket(s.id, tkReason, "loss")} style={{ padding: "6px 12px", background: "#fef2f2", border: "1px solid #fca5a5", borderRadius: 8, color: "#dc2626", cursor: "pointer", fontSize: 11, fontWeight: 600 }}>
+                        💸 가상화폐 손실 (-{cashVal.toLocaleString()}원)
                       </button>
                     </div>
                   </div>
@@ -179,25 +178,32 @@ export default function Admin() {
 
           {ticketLog.length > 0 && (
             <Card>
-              <h3 style={{ margin: "0 0 12px", fontSize: 15, fontWeight: 600, color: "#4f46e5" }}>📋 행운권 지급 기록</h3>
+              <h3 style={{ margin: "0 0 12px", fontSize: 15, fontWeight: 600, color: "#4f46e5" }}>📋 행운권 환전 기록</h3>
               <div style={{ maxHeight: 300, overflow: "auto" }}>
-                {ticketLog.slice(0, 30).map(l => (
-                  <div key={l.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 10px", borderBottom: "1px solid #e8ecf4", fontSize: 12 }}>
-                    <div>
-                      <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: 6, fontSize: 10, fontWeight: 600, background: l.choice === "cash" ? "#f0fdf4" : "#faf5ff", color: l.choice === "cash" ? "#16a34a" : "#7c3aed", marginRight: 6 }}>
-                        {l.choice === "cash" ? "💰 가상화폐" : "🎫 실물"}
-                      </span>
-                      <span style={{ color: "#1e293b" }}>{l.studentName}</span>
-                      <span style={{ color: "#94a3b8", margin: "0 4px" }}>·</span>
-                      <span style={{ color: "#4f46e5" }}>{l.emoji} {l.reason}</span>
+                {ticketLog.slice(0, 30).map(l => {
+                  const isCash = l.choice === "cash";
+                  const isLoss = l.choice === "loss";
+                  const badgeBg = isCash ? "#f0fdf4" : isLoss ? "#fef2f2" : "#faf5ff";
+                  const badgeColor = isCash ? "#16a34a" : isLoss ? "#dc2626" : "#7c3aed";
+                  const badgeText = isCash ? "💰 환전" : isLoss ? "💸 손실" : "🎫 실물";
+                  return (
+                    <div key={l.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 10px", borderBottom: "1px solid #e8ecf4", fontSize: 12 }}>
+                      <div>
+                        <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: 6, fontSize: 10, fontWeight: 600, background: badgeBg, color: badgeColor, marginRight: 6 }}>
+                          {badgeText}
+                        </span>
+                        <span style={{ color: "#1e293b" }}>{l.studentName}</span>
+                        <span style={{ color: "#94a3b8", margin: "0 4px" }}>·</span>
+                        <span style={{ color: "#4f46e5" }}>{l.emoji} {l.reason}</span>
+                      </div>
+                      <div style={{ textAlign: "right" }}>
+                        <span style={{ fontWeight: 600 }}>{l.tickets}장</span>
+                        {l.cashAmount ? <span style={{ color: l.cashAmount > 0 ? "#16a34a" : "#dc2626", marginLeft: 6 }}>{l.cashAmount > 0 ? "+" : ""}{l.cashAmount.toLocaleString()}원</span> : null}
+                        <div style={{ fontSize: 10, color: "#94a3b8" }}>{l.date}</div>
+                      </div>
                     </div>
-                    <div style={{ textAlign: "right" }}>
-                      <span style={{ fontWeight: 600 }}>{l.tickets}장</span>
-                      {l.choice === "cash" && <span style={{ color: "#16a34a", marginLeft: 6 }}>+{l.cashAmount.toLocaleString()}원</span>}
-                      <div style={{ fontSize: 10, color: "#94a3b8" }}>{l.date}</div>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </Card>
           )}
