@@ -21,5 +21,6 @@ if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
 const app = initializeApp(firebaseConfig);
 export const db = initializeFirestore(app, {
   localCache: persistentLocalCache({ tabManager: persistentSingleTabManager() }),
-  experimentalAutoDetectLongPolling: true
+  experimentalForceLongPolling: true,
+  useFetchStreams: false
 });
