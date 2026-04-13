@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Minus } from "lucide-react";
 import { useApp } from "../context/AppContext";
 import { MAX_SHARES } from "../constants";
@@ -6,12 +6,19 @@ import { ss, si, qb } from "../styles";
 import Card from "./Card";
 
 export default function Trade() {
-  const { students, doTrade, txs, isMobile } = useApp();
-  const [buyer, setBuyer] = useState("");
+  const { students, doTrade, txs, isMobile, myId, isAdmin } = useApp();
+  const [buyer, setBuyer] = useState(!isAdmin && myId != null ? String(myId) : "");
   const [co, setCo] = useState("");
   const [sh, setSh] = useState(1);
   const [type, setType] = useState("buy");
   const [msg, setMsg] = useState(null);
+
+  useEffect(() => {
+    if (!isAdmin && myId != null) {
+      setBuyer(String(myId));
+      setCo("");
+    }
+  }, [myId, isAdmin]);
 
   const b = students.find(s => s.id === Number(buyer));
   const c = students.find(s => s.id === Number(co));
@@ -38,11 +45,24 @@ export default function Trade() {
           ))}
         </div>
 
-        <label style={ss}>투자자</label>
-        <select value={buyer} onChange={e => { setBuyer(e.target.value); setCo(""); }} style={si}>
-          <option value="">선택</option>
-          {students.map(s => <option key={s.id} value={s.id}>{s.name} ({s.cash.toLocaleString()}원)</option>)}
-        </select>
+        {isAdmin ? (
+          <>
+            <label style={ss}>투자자</label>
+            <select value={buyer} onChange={e => { setBuyer(e.target.value); setCo(""); }} style={si}>
+              <option value="">선택</option>
+              {students.map(s => <option key={s.id} value={s.id}>{s.name} ({s.cash.toLocaleString()}원)</option>)}
+            </select>
+          </>
+        ) : b ? (
+          <>
+            <label style={ss}>투자자 (내 계정)</label>
+            <div style={{ ...si, background: "#eef2ff", borderColor: "#c7d2fe", color: "#4f46e5", fontWeight: 600, display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ fontSize: 18 }}>{b.emoji}</span>
+              <span>{b.name}</span>
+              <span style={{ marginLeft: "auto", color: "#64748b", fontSize: 12, fontWeight: 500 }}>{b.cash.toLocaleString()}원</span>
+            </div>
+          </>
+        ) : null}
 
         <label style={ss}>대상 회사</label>
         <select value={co} onChange={e => setCo(e.target.value)} style={si}>
