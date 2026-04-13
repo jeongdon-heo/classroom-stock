@@ -1,7 +1,6 @@
-import { useState, useEffect, useCallback, lazy, Suspense } from "react";
+import { useState, useEffect, useCallback, useRef, lazy, Suspense } from "react";
 import { BarChart3, ShoppingCart, Trophy, Settings, BookOpen, Gift } from "lucide-react";
-import { db } from "./firebase";
-import { doc, getDocFromCache, getDocFromServer, setDoc } from "firebase/firestore";
+import { fetchDoc, saveDoc } from "./firebase";
 import { AppContext } from "./context/AppContext";
 import { SAMPLE_STUDENTS, DEFAULT_STOCK_PRICE, DEFAULT_CASH, GRADES, SALARY_RATE, MISSION_CASH, MAX_SHARES } from "./constants";
 import { uid } from "./utils";
@@ -44,47 +43,48 @@ export default function App() {
     }
   }, []);
 
+  const savingRef = useRef(0);
+  const lastSaveAt = useRef(0);
+
   const save = useCallback(async (s, t, w, m, e, tl) => {
+    savingRef.current++;
     try {
       const ops = [
-        setDoc(doc(db, "classroom", "students"), { data: JSON.stringify(s) }),
-        setDoc(doc(db, "classroom", "txs"), { data: JSON.stringify(t) }),
-        setDoc(doc(db, "classroom", "meta"), { w, m }),
-        setDoc(doc(db, "classroom", "evts"), { data: JSON.stringify(e) }),
+        saveDoc("students", { data: JSON.stringify(s) }),
+        saveDoc("txs", { data: JSON.stringify(t) }),
+        saveDoc("meta", { w, m: m || "" }),
+        saveDoc("evts", { data: JSON.stringify(e) }),
       ];
-      if (tl !== undefined) ops.push(setDoc(doc(db, "classroom", "tickets"), { data: JSON.stringify(tl) }));
+      if (tl !== undefined) ops.push(saveDoc("tickets", { data: JSON.stringify(tl) }));
       await Promise.all(ops);
+      lastSaveAt.current = Date.now();
     } catch (err) { console.error("Firestore save error:", err); }
+    finally { savingRef.current--; }
   }, []);
 
-  function applySnaps(snap, tSnap, mSnap, eSnap, tlSnap) {
-    if (snap.exists()) {
-      setStudents(JSON.parse(snap.data().data));
-      setTxs(tSnap.exists() ? JSON.parse(tSnap.data().data) : []);
-      if (mSnap.exists()) { const d = mSnap.data(); setWeek(d.w || 1); setMission(d.m || ""); }
-      setEvts(eSnap.exists() ? JSON.parse(eSnap.data().data) : []);
-      setTicketLog(tlSnap.exists() ? JSON.parse(tlSnap.data().data) : []);
+  function applyDocs(stu, tx, meta, evt, tkt) {
+    if (stu?.data) {
+      setStudents(JSON.parse(stu.data));
+      setTxs(tx?.data ? JSON.parse(tx.data) : []);
+      if (meta) { setWeek(meta.w || 1); setMission(meta.m || ""); }
+      setEvts(evt?.data ? JSON.parse(evt.data) : []);
+      setTicketLog(tkt?.data ? JSON.parse(tkt.data) : []);
       return true;
     }
     return false;
   }
 
   useEffect(() => {
-    const docs = ["students", "txs", "meta", "evts", "tickets"].map(k => doc(db, "classroom", k));
     (async () => {
-      let cacheHit = false;
       try {
-        const cached = await Promise.all(docs.map(d => getDocFromCache(d)));
-        cacheHit = applySnaps(...cached);
-        if (cacheHit) setLoading(false);
-      } catch (e) { console.debug("Cache miss:", e.message); }
-      try {
-        const server = await Promise.all(docs.map(d => getDocFromServer(d)));
-        const serverHit = applySnaps(...server);
-        if (!serverHit && !cacheHit) resetLocal();
+        const docs = await Promise.all([
+          fetchDoc("students"), fetchDoc("txs"),
+          fetchDoc("meta"), fetchDoc("evts"), fetchDoc("tickets"),
+        ]);
+        if (!applyDocs(...docs)) resetLocal();
       } catch (err) {
         console.error("Firestore load error:", err);
-        if (!cacheHit) setLoadError(err.message || String(err));
+        setLoadError(err.message || String(err));
       }
       setLoading(false);
     })();
@@ -110,9 +110,14 @@ export default function App() {
     save(s, t, w, m, e);
   }, [save]);
 
-  const saveTickets = useCallback((tl) => {
+  const saveTickets = useCallback(async (tl) => {
     setTicketLog(tl);
-    setDoc(doc(db, "classroom", "tickets"), { data: JSON.stringify(tl) }).catch(err => console.error("Ticket save error:", err));
+    savingRef.current++;
+    try {
+      await saveDoc("tickets", { data: JSON.stringify(tl) });
+      lastSaveAt.current = Date.now();
+    } catch (err) { console.error("Ticket save error:", err); }
+    finally { savingRef.current--; }
   }, []);
 
   function portfolioVal(port, studs) {
@@ -193,6 +198,22 @@ export default function App() {
       setMyId(null);
     }
   }, [students, myId, setMyId]);
+
+  useEffect(() => {
+    if (loading || loadError) return;
+    const id = setInterval(async () => {
+      if (savingRef.current > 0) return;
+      if (Date.now() - lastSaveAt.current < 3000) return;
+      try {
+        const docs = await Promise.all([
+          fetchDoc("students"), fetchDoc("txs"),
+          fetchDoc("meta"), fetchDoc("evts"), fetchDoc("tickets"),
+        ]);
+        applyDocs(...docs);
+      } catch (err) { console.debug("Poll error:", err.message); }
+    }, 5000);
+    return () => clearInterval(id);
+  }, [loading, loadError]);
 
   if (loading) return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", background: "#f0f4ff", color: "#1e293b", fontFamily: "'Noto Sans KR', sans-serif" }}>
