@@ -81,12 +81,12 @@ export default function ReportOverlay({ onClose }) {
               <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
                 <div style={{ flex: 1, background: rank <= 3 ? "#fffbf0" : "#f0f5ff", borderRadius: 10, padding: "14px 12px", textAlign: "center", border: `1px solid ${rank <= 3 ? "#ffe0b2" : "#e0e8ff"}` }}>
                   <div style={{ fontSize: 12, color: "#888", marginBottom: 4 }}>주가 순위</div>
-                  <div style={{ fontSize: 28, fontWeight: 900, color: rank <= 3 ? "#f57c00" : "#1a237e" }}>{rank <= 3 ? ["🥇 1위","���� 2위","🥉 3위"][rank-1] : `${rank}위`}</div>
+                  <div style={{ fontSize: 28, fontWeight: 900, color: rank <= 3 ? "#f57c00" : "#1a237e" }}>{rank <= 3 ? ["🥇 1위","🥈 2위","🥉 3위"][rank-1] : `${rank}위`}</div>
                   <div style={{ fontSize: 11, color: "#aaa" }}>{students.length}명 중</div>
                 </div>
                 <div style={{ flex: 1, background: assetRank <= 3 ? "#faf0ff" : "#f5f0ff", borderRadius: 10, padding: "14px 12px", textAlign: "center", border: `1px solid ${assetRank <= 3 ? "#e0c8ff" : "#e8e0ff"}` }}>
-                  <div style={{ fontSize: 12, color: "#888", marginBottom: 4 }}>자산 ��위</div>
-                  <div style={{ fontSize: 28, fontWeight: 900, color: assetRank <= 3 ? "#f57c00" : "#4a148c" }}>{assetRank <= 3 ? ["🥇 1위","🥈 2���","🥉 3��"][assetRank-1] : `${assetRank}위`}</div>
+                  <div style={{ fontSize: 12, color: "#888", marginBottom: 4 }}>자산 순위</div>
+                  <div style={{ fontSize: 28, fontWeight: 900, color: assetRank <= 3 ? "#f57c00" : "#4a148c" }}>{assetRank <= 3 ? ["🥇 1위","🥈 2위","🥉 3위"][assetRank-1] : `${assetRank}위`}</div>
                   <div style={{ fontSize: 11, color: "#aaa" }}>{students.length}명 중</div>
                 </div>
                 <div style={{ flex: 1.2, background: "#f8faff", borderRadius: 10, padding: "14px 12px", textAlign: "center", border: "1px solid #e8f0fe" }}>
@@ -138,7 +138,7 @@ export default function ReportOverlay({ onClose }) {
 
                 <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                   <div style={{ background: "#fafbff", borderRadius: 12, padding: 16, border: "1px solid #e8f0fe" }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: "#888", marginBottom: 10 }}>📊 주가 추���</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "#888", marginBottom: 10 }}>📊 주가 추이</div>
                     <div style={{ display: "flex", alignItems: "flex-end", gap: 4, height: 100 }}>
                       {chartData.map((d, i) => {
                         const maxP = Math.max(...chartData.map(x => x.price));
@@ -189,7 +189,7 @@ export default function ReportOverlay({ onClose }) {
                   <div style={{ background: "#fafafa", borderRadius: 10, padding: 14, border: "1px solid #eee" }}>
                     <div style={{ fontSize: 13, fontWeight: 700, color: "#888", marginBottom: 8 }}>📋 최근 투자 내역</div>
                     {myTxs.length === 0 ? (
-                      <div style={{ fontSize: 13, color: "#bbb", textAlign: "center", padding: 12 }}>거래 내��이 없습니다</div>
+                      <div style={{ fontSize: 13, color: "#bbb", textAlign: "center", padding: 12 }}>거래 내역이 없습니다</div>
                     ) : myTxs.map(t => (
                       <div key={t.id} style={{ display: "flex", justifyContent: "space-between", fontSize: 12, padding: "5px 0", borderBottom: "1px solid #f0f0f0" }}>
                         <div>

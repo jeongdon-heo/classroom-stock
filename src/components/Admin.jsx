@@ -113,7 +113,7 @@ export default function Admin() {
 
             {tkMsg && (
               <div style={{ padding: "12px 16px", borderRadius: 10, marginBottom: 14, background: tkMsg.choice === "cash" ? "#f0fdf4" : "#faf5ff", border: `1px solid ${tkMsg.choice === "cash" ? "#86efac" : "#d8b4fe"}`, color: tkMsg.choice === "cash" ? "#16a34a" : "#7c3aed", fontSize: 13 }}>
-                ✅ {tkMsg.name}에게 행운권 {tkMsg.tickets}장 → {tkMsg.choice === "cash" ? `가상 화폐 +${tkMsg.cash.toLocaleString()}원 전환 완료!` : "실물 행운��� 지급 완료!"}
+                ✅ {tkMsg.name}에게 행운권 {tkMsg.tickets}장 → {tkMsg.choice === "cash" ? `가상 화폐 +${tkMsg.cash.toLocaleString()}원 전환 완료!` : "실물 행운권 지급 완료!"}
               </div>
             )}
 
@@ -258,7 +258,7 @@ export default function Admin() {
 
       {sub === "vote" && (
         <Card>
-          <h3 style={{ margin: "0 0 4px", fontSize: 15, fontWeight: 600, color: "#4f46e5" }}>🗳️ 친구 평���</h3>
+          <h3 style={{ margin: "0 0 4px", fontSize: 15, fontWeight: 600, color: "#4f46e5" }}>🗳️ 친구 평가</h3>
           <p style={{ margin: "0 0 16px", fontSize: 12, color: "#64748b" }}>상위 30%: +400 / 중위: +100 / 하위 30%: -100</p>
           <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12 }}>
             <button onClick={resetVotes} style={{ padding: "6px 14px", background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 8, color: "#dc2626", cursor: "pointer", fontSize: 12 }}>초기화</button>
@@ -536,7 +536,7 @@ export default function Admin() {
       {sub === "manage" && (
         <Card>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: isMobile ? "flex-start" : "center", marginBottom: 16, flexDirection: isMobile ? "column" : "row", gap: isMobile ? 10 : 0 }}>
-            <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: "#4f46e5" }}>👥 학생 관��</h3>
+            <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: "#4f46e5" }}>👥 학생 관리</h3>
             <div style={{ display: "flex", gap: 8 }}>
               <button onClick={() => { if (window.confirm("예시 데이터(8명)를 불러올까요?")) { loadSample(); window.alert("예시 데이터를 불러왔습니다!"); } }} style={{ display: "flex", alignItems: "center", gap: 4, padding: "8px 14px", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 8, color: "#d97706", cursor: "pointer", fontSize: 12, fontWeight: 600 }}><Sparkles size={14} /> 예시 데이터</button>
               <button onClick={() => setShowBulk(true)} style={{ display: "flex", alignItems: "center", gap: 4, padding: "8px 14px", background: "#faf5ff", border: "1px solid #d8b4fe", borderRadius: 8, color: "#7c3aed", cursor: "pointer", fontSize: 12, fontWeight: 600 }}><Users size={14} /> 일괄 등록</button>
@@ -547,12 +547,12 @@ export default function Admin() {
 
           {showBulk && (
             <div style={{ background: "#faf5ff", borderRadius: 12, padding: 16, marginBottom: 16, border: "1px solid #e9d5ff" }}>
-              <h4 style={{ margin: "0 0 4px", fontSize: 14, color: "#7c3aed" }}>📋 학생 일��� 등록</h4>
+              <h4 style={{ margin: "0 0 4px", fontSize: 14, color: "#7c3aed" }}>📋 학생 일괄 등록</h4>
               <p style={{ margin: "0 0 12px", fontSize: 12, color: "#64748b" }}>학생 이름을 한 줄에 하나씩 입력하세요. 회사 이름과 슬로건은 자동 생성되며, 나중에 학생들이 정하면 수정할 수 있습니다.</p>
               <textarea value={bulkText} onChange={e => setBulkText(e.target.value)} placeholder={"김도윤\n이서연\n박지호\n최유나\n정민재\n...\n\n(한 줄에 한 명씩)"} style={{ ...si, height: 180, resize: "vertical", fontFamily: "'Noto Sans KR', sans-serif", lineHeight: 1.8 }} />
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
                 <span style={{ fontSize: 12, color: "#64748b" }}>
-                  {bulkText.trim() ? `${bulkText.trim().split("\n").filter(l => l.trim()).length}명 감지됨` : "이름을 ���력하세요"}
+                  {bulkText.trim() ? `${bulkText.trim().split("\n").filter(l => l.trim()).length}명 감지됨` : "이름을 입력하세요"}
                 </span>
                 <div style={{ display: "flex", gap: 8 }}>
                   <button onClick={() => { setShowBulk(false); setBulkText(""); }} style={{ padding: "8px 16px", background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 8, color: "#64748b", cursor: "pointer", fontSize: 13 }}>취소</button>
@@ -593,7 +593,7 @@ export default function Admin() {
             </div>
           )}
 
-          <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 8 }}>💡 회사 이름과 슬로건은 클릭해서 바로 수정할 수 있습��다. 이모지도 변경 가능해요.</div>
+          <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 8 }}>💡 회사 이름과 슬로건은 클릭해서 바로 수정할 수 있습니다. 이모지도 변경 가능해요.</div>
           <div style={{ display: "grid", gap: 6 }}>
             {students.map(s => (
               <div key={s.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", background: "#f8fafc", borderRadius: 10, border: "1px solid #e8ecf4" }}>
@@ -622,7 +622,7 @@ export default function Admin() {
           <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
             <div style={{ flex: 1, background: "#fffbeb", borderRadius: 10, padding: "10px 14px", border: "1px solid #fde68a" }}>
               <div style={{ fontSize: 11, color: "#d97706", marginBottom: 2 }}>💰 CEO 급여</div>
-              <div style={{ fontSize: 13, color: "#1e293b" }}>정산 후 주가의 <b>10%</b>를 현금으�� 지급</div>
+              <div style={{ fontSize: 13, color: "#1e293b" }}>정산 후 주가의 <b>10%</b>를 현금으로 지급</div>
             </div>
             <div style={{ flex: 1, background: "#f0fdf4", borderRadius: 10, padding: "10px 14px", border: "1px solid #f0fdf4" }}>
               <div style={{ fontSize: 11, color: "#16a34a", marginBottom: 2 }}>📦 사업 수익</div>
@@ -661,7 +661,7 @@ export default function Admin() {
               );
             })}
           </div>
-          <button onClick={settle} style={{ width: "100%", padding: 16, background: "linear-gradient(135deg, #7c3aed, #8b5cf6)", border: "none", borderRadius: 12, color: "#fff", fontSize: 16, fontWeight: 800, cursor: "pointer", letterSpacing: 1 }}>🔔 {week}주��� 정산 실행!</button>
+          <button onClick={settle} style={{ width: "100%", padding: 16, background: "linear-gradient(135deg, #7c3aed, #8b5cf6)", border: "none", borderRadius: 12, color: "#fff", fontSize: 16, fontWeight: 800, cursor: "pointer", letterSpacing: 1 }}>🔔 {week}주차 정산 실행!</button>
           <div style={{ textAlign: "center", marginTop: 8, fontSize: 11, color: "#64748b" }}>⚠️ 정산 후 되돌릴 수 없습니다</div>
         </Card>
       )}
@@ -733,11 +733,11 @@ export default function Admin() {
 
               <div style={{ display: "flex", gap: 12, marginBottom: 20, justifyContent: "center" }}>
                 <div style={{ background: "#fffbeb", borderRadius: 12, padding: "14px 24px", textAlign: "center", border: "1px solid #fde68a" }}>
-                  <div style={{ fontSize: 11, color: "#d97706" }}>현재 입찰��</div>
+                  <div style={{ fontSize: 11, color: "#d97706" }}>현재 입찰가</div>
                   <div style={{ fontSize: 32, fontWeight: 900, color: "#b45309" }}>{aucActive.currentBid.toLocaleString()}원</div>
                 </div>
                 <div style={{ background: "#f0fdf4", borderRadius: 12, padding: "14px 24px", textAlign: "center", border: "1px solid #f0fdf4" }}>
-                  <div style={{ fontSize: 11, color: "#16a34a" }}>최고 입찰��</div>
+                  <div style={{ fontSize: 11, color: "#16a34a" }}>최고 입찰자</div>
                   <div style={{ fontSize: 24, fontWeight: 900, color: aucActive.bidderId ? "#16a34a" : "#94a3b8" }}>{aucActive.bidderName}</div>
                 </div>
               </div>
@@ -802,7 +802,7 @@ export default function Admin() {
       {sub === "report" && (
         <div>
           <Card style={{ marginBottom: 16 }}>
-            <h3 style={{ margin: "0 0 4px", fontSize: 15, fontWeight: 600, color: "#4f46e5" }}>🖨️ 주간 보고서 출���</h3>
+            <h3 style={{ margin: "0 0 4px", fontSize: 15, fontWeight: 600, color: "#4f46e5" }}>🖨️ 주간 보고서 출력</h3>
             <p style={{ margin: "0 0 16px", fontSize: 12, color: "#64748b" }}>학생 개인별 주간 보고서를 인쇄용으로 생성합니다. A4 용지에 2명씩 출력됩니다.</p>
             <button onClick={() => setShowReport(true)} style={{ width: "100%", padding: 16, background: "linear-gradient(135deg, #6366f1, #818cf8)", border: "none", borderRadius: 12, color: "#fff", fontSize: 16, fontWeight: 800, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
               <Printer size={20} /> 전체 학생 보고서 미리보기 / 인쇄
