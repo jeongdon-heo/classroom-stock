@@ -5,6 +5,7 @@ import { DEFAULT_STOCK_PRICE, DEFAULT_CASH, GRADES, MISSION_CASH, SALARY_RATE, T
 import { uid } from "../utils";
 import { ss, si, qb, sb } from "../styles";
 import Card from "./Card";
+import EmojiPicker from "./EmojiPicker";
 import ReportOverlay from "./ReportOverlay";
 
 export default function Admin() {
@@ -579,8 +580,8 @@ export default function Admin() {
           {showAdd && (
             <div style={{ background: "#f8fafc", borderRadius: 12, padding: 16, marginBottom: 16, border: "1px solid #e2e8f0" }}>
               <h4 style={{ margin: "0 0 12px", fontSize: 14, color: "#1e293b" }}>새 학생</h4>
-              <div style={{ display: "grid", gridTemplateColumns: "60px 1fr 1fr", gap: 8, marginBottom: 8 }}>
-                <div><label style={ss}>이모지</label><input value={ne} onChange={e => setNe(e.target.value)} maxLength={4} style={{ ...si, textAlign: "center", fontSize: 20, padding: 6 }} /></div>
+              <div style={{ display: "grid", gridTemplateColumns: "60px 1fr 1fr", gap: 8, marginBottom: 8, alignItems: "end" }}>
+                <div><label style={ss}>이모지</label><EmojiPicker value={ne} onChange={setNe} size={40} /></div>
                 <div><label style={ss}>이름</label><input value={nn} onChange={e => setNn(e.target.value)} maxLength={20} placeholder="홍길동" style={si} /></div>
                 <div><label style={ss}>회사명</label><input value={nc} onChange={e => setNc(e.target.value)} maxLength={30} placeholder="미래 주식회사" style={si} /></div>
               </div>
@@ -598,7 +599,7 @@ export default function Admin() {
             {students.map(s => (
               <div key={s.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", background: "#f8fafc", borderRadius: 10, border: "1px solid #e8ecf4" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 6, flex: 1 }}>
-                  <input value={s.emoji} onChange={e => setStudents(students.map(x => x.id === s.id ? { ...x, emoji: e.target.value } : x))} maxLength={4} style={{ width: 36, fontSize: 20, background: "transparent", border: "1px solid transparent", borderRadius: 6, textAlign: "center", cursor: "pointer", padding: 2, color: "#fff" }} onFocus={e => e.target.style.borderColor = "#a5b4fc"} onBlur={e => e.target.style.borderColor = "transparent"} />
+                  <EmojiPicker value={s.emoji} onChange={v => setStudents(students.map(x => x.id === s.id ? { ...x, emoji: v } : x))} size={36} />
                   <div style={{ flex: 1 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
                       <span style={{ fontWeight: 600, fontSize: 13, color: "#1e293b" }}>{s.name}</span>

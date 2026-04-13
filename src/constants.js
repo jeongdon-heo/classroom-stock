@@ -16,6 +16,7 @@ export const GRADES = { S: 500, A: 300, B: 100, "미완수": -100 };
 export const SALARY_RATE = 0.1;
 export const MISSION_CASH = { S: 300, A: 200, B: 100, "미완수": 0 };
 export const TICKET_VALUE = 100;
+export const EMOJI_PALETTE = ["🏢","💡","🔢","📚","⚽","🎨","🔬","💖","🌟","🎯","🚀","🎪","🌈","🎸","🏆","🌻","🐬","🦁","🎭","🍀","🔥","⭐","🎵","🌍","🦋","🎈","🏅","💎","🎮","🌺"];
 export const TICKET_REASONS = [
   { id: "morning", label: "아침활동", tickets: 1, emoji: "🌅" },
   { id: "reading", label: "독서록", tickets: 2, emoji: "📖" },
