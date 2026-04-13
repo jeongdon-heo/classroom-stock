@@ -19,6 +19,7 @@ const StudentLogin = lazy(() => import("./components/StudentLogin"));
 
 export default function App() {
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
   const [tab, setTab] = useState("dashboard");
   const [students, setStudents] = useState([]);
   const [txs, setTxs] = useState([]);
@@ -79,18 +80,18 @@ export default function App() {
       } catch (e) { console.debug("Cache miss:", e.message); }
       try {
         const server = await Promise.all(docs.map(d => getDocFromServer(d)));
-        if (!applySnaps(...server) && !cacheHit) initEmpty();
+        const serverHit = applySnaps(...server);
+        if (!serverHit && !cacheHit) resetLocal();
       } catch (err) {
         console.error("Firestore load error:", err);
-        if (!cacheHit) initEmpty();
+        if (!cacheHit) setLoadError(err.message || String(err));
       }
       setLoading(false);
     })();
   }, []);
 
-  function initEmpty() {
+  function resetLocal() {
     setStudents([]); setTxs([]); setWeek(1); setMission(""); setEvts([]); setTicketLog([]);
-    save([], [], 1, "", [], []);
   }
 
   function loadSample() {
@@ -176,8 +177,11 @@ export default function App() {
 
   function resetAll() {
     if (!window.confirm("모든 데이터를 초기화합니까?")) return;
-    try { initEmpty(); window.alert("초기화가 완료되었습니다!"); }
-    catch (err) { window.alert("초기화 오류: " + err.message); }
+    try {
+      resetLocal();
+      save([], [], 1, "", [], []);
+      window.alert("초기화가 완료되었습니다!");
+    } catch (err) { window.alert("초기화 오류: " + err.message); }
   }
 
   const isMobile = useIsMobile();
@@ -193,6 +197,24 @@ export default function App() {
   if (loading) return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", background: "#f0f4ff", color: "#1e293b", fontFamily: "'Noto Sans KR', sans-serif" }}>
       <div style={{ textAlign: "center" }}><div style={{ fontSize: 48, marginBottom: 16 }}>📈</div><div style={{ fontSize: 18, color: "#6366f1", fontWeight: 600 }}>로딩중...</div></div>
+    </div>
+  );
+
+  if (loadError) return (
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", background: "#f0f4ff", color: "#1e293b", fontFamily: "'Noto Sans KR', sans-serif", padding: 20 }}>
+      <div style={{ textAlign: "center", maxWidth: 440, background: "#fff", borderRadius: 16, padding: 28, boxShadow: "0 10px 30px rgba(0,0,0,0.08)" }}>
+        <div style={{ fontSize: 44, marginBottom: 12 }}>⚠️</div>
+        <div style={{ fontSize: 18, fontWeight: 700, color: "#dc2626", marginBottom: 8 }}>데이터를 불러올 수 없어요</div>
+        <div style={{ fontSize: 13, color: "#64748b", marginBottom: 14, lineHeight: 1.5 }}>
+          네트워크 연결을 확인해주세요. 서버에 접속하지 못한 상태에서 앱을 사용하면 다른 기기의 데이터를 잃을 수 있어 일단 멈춰둡니다.
+        </div>
+        <div style={{ fontSize: 11, color: "#94a3b8", background: "#f8fafc", borderRadius: 8, padding: 10, marginBottom: 16, wordBreak: "break-all", textAlign: "left" }}>
+          {loadError}
+        </div>
+        <button onClick={() => window.location.reload()} style={{ padding: "10px 20px", background: "linear-gradient(135deg, #6366f1, #8b5cf6)", color: "#fff", border: "none", borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: "pointer" }}>
+          다시 시도
+        </button>
+      </div>
     </div>
   );
 
