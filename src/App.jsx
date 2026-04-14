@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef, lazy, Suspense } from "react";
 import { BarChart3, ShoppingCart, Trophy, Settings, BookOpen, Gift } from "lucide-react";
-import { fetchDoc, saveDoc } from "./firebase";
+import { batchGetDocs, saveDoc } from "./firebase";
 import { AppContext } from "./context/AppContext";
 import { SAMPLE_STUDENTS, DEFAULT_STOCK_PRICE, DEFAULT_CASH, GRADES, SALARY_RATE, MISSION_CASH, MAX_SHARES } from "./constants";
 import { uid } from "./utils";
@@ -77,10 +77,7 @@ export default function App() {
   useEffect(() => {
     (async () => {
       try {
-        const docs = await Promise.all([
-          fetchDoc("students"), fetchDoc("txs"),
-          fetchDoc("meta"), fetchDoc("evts"), fetchDoc("tickets"),
-        ]);
+        const docs = await batchGetDocs(["students", "txs", "meta", "evts", "tickets"]);
         if (!applyDocs(...docs)) resetLocal();
       } catch (err) {
         console.error("Firestore load error:", err);
@@ -205,13 +202,10 @@ export default function App() {
       if (savingRef.current > 0) return;
       if (Date.now() - lastSaveAt.current < 3000) return;
       try {
-        const docs = await Promise.all([
-          fetchDoc("students"), fetchDoc("txs"),
-          fetchDoc("meta"), fetchDoc("evts"), fetchDoc("tickets"),
-        ]);
+        const docs = await batchGetDocs(["students", "txs", "meta", "evts", "tickets"]);
         applyDocs(...docs);
       } catch (err) { console.debug("Poll error:", err.message); }
-    }, 5000);
+    }, 10000);
     return () => clearInterval(id);
   }, [loading, loadError]);
 

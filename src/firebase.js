@@ -9,6 +9,10 @@ if (!PROJECT_ID || !API_KEY) {
 }
 
 const BASE = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents/classroom`;
+const DB_ROOT = `projects/${PROJECT_ID}/databases/(default)/documents/classroom`;
+const BATCH_GET_URL = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents:batchGet?key=${API_KEY}`;
+
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
 function fromFields(fields) {
   if (!fields) return null;
@@ -39,6 +43,39 @@ export async function fetchDoc(docId) {
   if (!res.ok) throw new Error(`문서 조회 실패 (${docId}): HTTP ${res.status}`);
   const json = await res.json();
   return fromFields(json.fields);
+}
+
+export async function batchGetDocs(docIds, { retries = 2 } = {}) {
+  const documents = docIds.map(id => `${DB_ROOT}/${id}`);
+  let attempt = 0;
+  while (true) {
+    const res = await fetch(BATCH_GET_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ documents })
+    });
+    if (res.ok) {
+      const json = await res.json();
+      const map = new Map();
+      for (const item of json) {
+        if (item.found) {
+          const name = item.found.name;
+          const id = name.slice(name.lastIndexOf("/") + 1);
+          map.set(id, fromFields(item.found.fields));
+        } else if (item.missing) {
+          const id = item.missing.slice(item.missing.lastIndexOf("/") + 1);
+          map.set(id, null);
+        }
+      }
+      return docIds.map(id => map.get(id) ?? null);
+    }
+    if (res.status === 429 && attempt < retries) {
+      await sleep(1000 * Math.pow(2, attempt));
+      attempt++;
+      continue;
+    }
+    throw new Error(`문서 조회 실패 (batch): HTTP ${res.status}`);
+  }
 }
 
 export async function saveDoc(docId, data) {
