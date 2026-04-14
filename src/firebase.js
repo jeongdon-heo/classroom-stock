@@ -74,7 +74,8 @@ export async function batchGetDocs(docIds, { retries = 2 } = {}) {
       attempt++;
       continue;
     }
-    throw new Error(`문서 조회 실패 (batch): HTTP ${res.status}`);
+    const text = await res.text().catch(() => "");
+    throw new Error(`문서 조회 실패 (batch): HTTP ${res.status} ${text.slice(0, 300)}`);
   }
 }
 
