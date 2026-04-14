@@ -205,7 +205,7 @@ export default function App() {
         const docs = await batchGetDocs(["students", "txs", "meta", "evts", "tickets"]);
         applyDocs(...docs);
       } catch (err) { console.debug("Poll error:", err.message); }
-    }, 10000);
+    }, 20000);
     return () => clearInterval(id);
   }, [loading, loadError]);
 
