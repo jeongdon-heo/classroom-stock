@@ -1,5 +1,5 @@
-const PROJECT_ID = import.meta.env.VITE_FIREBASE_PROJECT_ID;
-const API_KEY = import.meta.env.VITE_FIREBASE_API_KEY;
+const PROJECT_ID = import.meta.env.VITE_FIREBASE_PROJECT_ID?.trim();
+const API_KEY = import.meta.env.VITE_FIREBASE_API_KEY?.trim();
 
 if (!PROJECT_ID || !API_KEY) {
   console.error(
