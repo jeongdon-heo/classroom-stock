@@ -14,6 +14,7 @@ export const DEFAULT_CASH = 10000;
 export const MAX_SHARES = 3;
 export const GRADES = { S: 500, A: 300, B: 100, "미완수": -100 };
 export const SALARY_RATE = 0.1;
+export const DIVIDEND_RATE = 0.02;
 export const MISSION_CASH = { S: 300, A: 200, B: 100, "미완수": 0 };
 export const TICKET_VALUE = 100;
 export const EMOJI_PALETTE = ["🏢","💡","🔢","📚","⚽","🎨","🔬","💖","🌟","🎯","🚀","🎪","🌈","🎸","🏆","🌻","🐬","🦁","🎭","🍀","🔥","⭐","🎵","🌍","🦋","🎈","🏅","💎","🎮","🌺"];

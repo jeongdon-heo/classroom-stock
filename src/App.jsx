@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef, lazy, Suspense } from "react"
 import { BarChart3, ShoppingCart, Trophy, Settings, BookOpen, Gift } from "lucide-react";
 import { batchGetDocs, saveDoc } from "./firebase";
 import { AppContext } from "./context/AppContext";
-import { SAMPLE_STUDENTS, DEFAULT_STOCK_PRICE, DEFAULT_CASH, GRADES, SALARY_RATE, MISSION_CASH, MAX_SHARES } from "./constants";
+import { SAMPLE_STUDENTS, DEFAULT_STOCK_PRICE, DEFAULT_CASH, GRADES, SALARY_RATE, DIVIDEND_RATE, MISSION_CASH, MAX_SHARES } from "./constants";
 import { uid } from "./utils";
 import useIsMobile from "./hooks/useIsMobile";
 import Modal from "./components/Modal";
@@ -96,7 +96,7 @@ export default function App() {
       ...s, stockPrice: DEFAULT_STOCK_PRICE,
       history: [{ week: 0, price: DEFAULT_STOCK_PRICE, label: "시작" }],
       cash: DEFAULT_CASH, portfolio: [],
-      tp: 0, mg: "", pv: 0, lastSalary: 0, lastBiz: 0,
+      tp: 0, mg: "", pv: 0, lastSalary: 0, lastBiz: 0, lastDividend: 0,
     }));
     setStudents(init); setTxs([]); setWeek(1); setMission("독서록 3편 작성하기"); setEvts([]); setTicketLog([]);
     save(init, [], 1, "독서록 3편 작성하기", [], []);
@@ -161,18 +161,41 @@ export default function App() {
     const sorted = [...students].sort((a, b) => (b.pv || 0) - (a.pv || 0));
     const t30 = Math.max(1, Math.floor(n * 0.3));
     const b30 = Math.max(1, Math.floor(n * 0.3));
-    const up = students.map(s => {
+
+    const priceMap = new Map();
+    for (const s of students) {
       const rank = sorted.findIndex(x => x.id === s.id);
       let pb = 100;
       if (rank < t30) pb = 400;
       else if (rank >= n - b30) pb = -100;
       const mb = GRADES[s.mg] || 0;
       const total = (s.tp || 0) + mb + pb;
-      const np = Math.max(100, s.stockPrice + total);
+      priceMap.set(s.id, Math.max(100, s.stockPrice + total));
+    }
+
+    const up = students.map(s => {
+      const np = priceMap.get(s.id);
       const salary = Math.round(np * SALARY_RATE);
       const bizIncome = MISSION_CASH[s.mg] || 0;
-      const newCash = s.cash + salary + bizIncome;
-      return { ...s, stockPrice: np, cash: newCash, history: [...s.history, { week, price: np, label: `${week}주` }], tp: 0, mg: "", pv: 0, lastSalary: salary, lastBiz: bizIncome };
+      const divDetails = s.portfolio.map(p => {
+        const holdPrice = priceMap.get(p.cid) || 0;
+        const perShare = Math.round(holdPrice * DIVIDEND_RATE);
+        return { cid: p.cid, sh: p.sh, perShare, amount: perShare * p.sh };
+      }).filter(d => d.amount > 0);
+      const dividend = divDetails.reduce((sum, d) => sum + d.amount, 0);
+      const newCash = s.cash + salary + bizIncome + dividend;
+      return {
+        ...s,
+        stockPrice: np,
+        cash: newCash,
+        history: [...s.history, { week, price: np, label: `${week}주` }],
+        tp: 0, mg: "", pv: 0,
+        lastSalary: salary,
+        lastBiz: bizIncome,
+        lastDividend: dividend,
+        lastDividendDetails: divDetails,
+        lastSettleWeek: week,
+      };
     });
     persist(up, txs, week + 1, "", evts);
   }

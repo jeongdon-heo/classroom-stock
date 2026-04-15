@@ -68,7 +68,7 @@ export default function Admin() {
   const addS = () => {
     if (!nn.trim() || !nc.trim()) return;
     if (nn.trim().length > 20 || nc.trim().length > 30 || ns.length > 50) return;
-    setStudents([...students, { id: Date.now(), name: nn, company: nc, slogan: ns || "열심히!", emoji: ne, stockPrice: DEFAULT_STOCK_PRICE, history: [{ week: Math.max(0, week - 1), price: DEFAULT_STOCK_PRICE, label: "시작" }], cash: DEFAULT_CASH, portfolio: [], tp: 0, mg: "", pv: 0, lastSalary: 0, lastBiz: 0 }]);
+    setStudents([...students, { id: Date.now(), name: nn, company: nc, slogan: ns || "열심히!", emoji: ne, stockPrice: DEFAULT_STOCK_PRICE, history: [{ week: Math.max(0, week - 1), price: DEFAULT_STOCK_PRICE, label: "시작" }], cash: DEFAULT_CASH, portfolio: [], tp: 0, mg: "", pv: 0, lastSalary: 0, lastBiz: 0, lastDividend: 0 }]);
     setNn(""); setNc(""); setNs(""); setNe("🏢"); setShowAdd(false);
   };
   const upPts = (id, a) => setStudents(students.map(s => s.id === id ? { ...s, tp: (s.tp || 0) + a } : s));
@@ -571,7 +571,7 @@ export default function Admin() {
                       id: Date.now() + i, name, company: `${name} 주식회사`, slogan: "열심히 하는 회사!",
                       emoji: emojis[i % emojis.length], stockPrice: DEFAULT_STOCK_PRICE,
                       history: [{ week: Math.max(0, week - 1), price: DEFAULT_STOCK_PRICE, label: "시작" }],
-                      cash: DEFAULT_CASH, portfolio: [], tp: 0, mg: "", pv: 0, lastSalary: 0, lastBiz: 0,
+                      cash: DEFAULT_CASH, portfolio: [], tp: 0, mg: "", pv: 0, lastSalary: 0, lastBiz: 0, lastDividend: 0,
                     }));
                     setStudents([...students, ...newStudents]);
                     setBulkText(""); setShowBulk(false);
