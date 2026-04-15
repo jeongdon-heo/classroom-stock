@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef, lazy, Suspense } from "react";
-import { BarChart3, ShoppingCart, Trophy, Settings, BookOpen, Gift } from "lucide-react";
+import { BarChart3, ShoppingCart, Trophy, Settings, BookOpen, Gift, Receipt } from "lucide-react";
 import { batchGetDocs, saveDoc } from "./firebase";
 import { AppContext } from "./context/AppContext";
 import { SAMPLE_STUDENTS, DEFAULT_STOCK_PRICE, DEFAULT_CASH, GRADES, SALARY_RATE, DIVIDEND_RATE, MISSION_CASH, MAX_SHARES } from "./constants";
@@ -12,6 +12,7 @@ const Trade = lazy(() => import("./components/Trade"));
 const Ranking = lazy(() => import("./components/Ranking"));
 const Manual = lazy(() => import("./components/Manual"));
 const Rewards = lazy(() => import("./components/Rewards"));
+const Settlement = lazy(() => import("./components/Settlement"));
 const Admin = lazy(() => import("./components/Admin"));
 const Detail = lazy(() => import("./components/Detail"));
 const StudentLogin = lazy(() => import("./components/StudentLogin"));
@@ -259,6 +260,7 @@ export default function App() {
   const tabs = [
     { id: "dashboard", label: "대시보드", icon: <BarChart3 size={18} /> },
     { id: "trade", label: "거래소", icon: <ShoppingCart size={18} /> },
+    { id: "settlement", label: "정산결과", icon: <Receipt size={18} /> },
     { id: "ranking", label: "순위표", icon: <Trophy size={18} /> },
     { id: "manual", label: "매뉴얼", icon: <BookOpen size={18} /> },
     { id: "rewards", label: "주주총회", icon: <Gift size={18} /> },
@@ -312,6 +314,7 @@ export default function App() {
         <Suspense fallback={<div style={{ padding: 40, textAlign: "center", color: "#6366f1", fontSize: 14 }}>불러오는 중...</div>}>
           {tab === "dashboard" && <Dashboard />}
           {tab === "trade" && <Trade />}
+          {tab === "settlement" && <Settlement />}
           {tab === "ranking" && <Ranking />}
           {tab === "manual" && <Manual />}
           {tab === "rewards" && <Rewards />}

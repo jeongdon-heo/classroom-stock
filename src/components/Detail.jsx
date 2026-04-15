@@ -54,7 +54,7 @@ export default function Detail({ s }) {
           <div style={{ fontSize: 10, color: up ? "#16a34a" : "#dc2626" }}>이번 주 변동</div>
           <div style={{ fontSize: 15, fontWeight: 700, color: up ? "#16a34a" : "#dc2626" }}>{up ? "+" : ""}{ch}원 ({prev > 0 ? ((ch / prev) * 100).toFixed(1) : 0}%)</div>
         </div>
-        {(s.lastSalary > 0 || s.lastBiz > 0) && (
+        {(s.lastSalary > 0 || s.lastBiz > 0 || s.lastDividend > 0) && (
           <>
             <div style={{ flex: 1, minWidth: 100, background: "#fffbeb", borderRadius: 8, padding: "8px 12px", border: "1px solid #fde68a" }}>
               <div style={{ fontSize: 10, color: "#b45309" }}>CEO 급여</div>
@@ -63,6 +63,10 @@ export default function Detail({ s }) {
             <div style={{ flex: 1, minWidth: 100, background: "#f0fdf4", borderRadius: 8, padding: "8px 12px", border: "1px solid #bbf7d0" }}>
               <div style={{ fontSize: 10, color: "#16a34a" }}>사업 수익</div>
               <div style={{ fontSize: 15, fontWeight: 700, color: "#16a34a" }}>+{(s.lastBiz || 0).toLocaleString()}원</div>
+            </div>
+            <div style={{ flex: 1, minWidth: 100, background: "#faf5ff", borderRadius: 8, padding: "8px 12px", border: "1px solid #e9d5ff" }}>
+              <div style={{ fontSize: 10, color: "#7c3aed" }}>주주 배당</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: "#7c3aed" }}>+{(s.lastDividend || 0).toLocaleString()}원</div>
             </div>
           </>
         )}

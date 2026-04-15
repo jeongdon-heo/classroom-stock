@@ -126,12 +126,13 @@ export default function ReportOverlay({ onClose }) {
                   </table>
 
                   <div style={{ background: "#fffbf0", borderRadius: 10, padding: 16, border: "1px solid #ffe0b2" }}>
-                    <div style={{ fontWeight: 800, marginBottom: 8, color: "#e65100", fontSize: 14 }}>💰 이번 주 CEO 수익</div>
+                    <div style={{ fontWeight: 800, marginBottom: 8, color: "#e65100", fontSize: 14 }}>💰 이번 주 수익</div>
                     <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, marginBottom: 4 }}><span>CEO 급여 (주가의 10%)</span><span style={{ fontWeight: 800, color: "#2e7d32" }}>+{(s.lastSalary || 0).toLocaleString()}원</span></div>
-                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, marginBottom: 6 }}><span>사업 수익 (미션 성과)</span><span style={{ fontWeight: 800, color: "#2e7d32" }}>+{(s.lastBiz || 0).toLocaleString()}원</span></div>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, marginBottom: 4 }}><span>사업 수익 (미션 성과)</span><span style={{ fontWeight: 800, color: "#2e7d32" }}>+{(s.lastBiz || 0).toLocaleString()}원</span></div>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, marginBottom: 6 }}><span>주주 배당 (주식 × 2%)</span><span style={{ fontWeight: 800, color: "#7c3aed" }}>+{(s.lastDividend || 0).toLocaleString()}원</span></div>
                     <div style={{ borderTop: "1px solid #ffe0b2", paddingTop: 6, display: "flex", justifyContent: "space-between", fontSize: 14 }}>
                       <span style={{ fontWeight: 800, color: "#e65100" }}>수익 합계</span>
-                      <span style={{ fontWeight: 900, color: "#e65100", fontSize: 16 }}>+{((s.lastSalary || 0) + (s.lastBiz || 0)).toLocaleString()}원</span>
+                      <span style={{ fontWeight: 900, color: "#e65100", fontSize: 16 }}>+{((s.lastSalary || 0) + (s.lastBiz || 0) + (s.lastDividend || 0)).toLocaleString()}원</span>
                     </div>
                   </div>
                 </div>
