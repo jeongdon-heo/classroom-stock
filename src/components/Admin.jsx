@@ -213,7 +213,7 @@ export default function Admin() {
       {sub === "points" && (
         <Card>
           <h3 style={{ margin: "0 0 4px", fontSize: 15, fontWeight: 600, color: "#4f46e5" }}>⭐ 선생님 포인트</h3>
-          <p style={{ margin: "0 0 16px", fontSize: 12, color: "#64748b" }}>수업 태도, 과제, 생활 평가 (최대 +300/-200)</p>
+          <p style={{ margin: "0 0 16px", fontSize: 12, color: "#64748b" }}>수업 태도, 과제, 생활 평가 (최대 +1000/-200)</p>
           <div style={{ display: "grid", gap: 6 }}>
             {students.map(s => (
               <div key={s.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", background: "#f8fafc", borderRadius: 10, border: "1px solid #e8ecf4" }}>
