@@ -307,7 +307,7 @@ export default function Admin() {
           </div>
           <label style={ss}>포인트</label>
           <div style={{ display: "flex", gap: 6, marginBottom: 16 }}>
-            {[-200, -100, 100, 150, 200, 300].map(v => (
+            {[-200, -100, 100, 150, 200, 300, 500, 1000].map(v => (
               <button key={v} onClick={() => setEa(v)} style={{ padding: "6px 12px", background: ea === v ? "#e0e7ff" : "#f8fafc", border: `1px solid ${ea === v ? "#a5b4fc" : "#e8ecf4"}`, borderRadius: 8, color: ea === v ? (v > 0 ? "#16a34a" : "#dc2626") : "#64748b", cursor: "pointer", fontSize: 13, fontWeight: ea === v ? 700 : 400 }}>{v > 0 ? "+" : ""}{v}</button>
             ))}
           </div>
