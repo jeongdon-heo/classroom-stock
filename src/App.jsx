@@ -30,6 +30,7 @@ export default function App() {
   const [showAdd, setShowAdd] = useState(false);
   const [showReport, setShowReport] = useState(false);
   const [ticketLog, setTicketLog] = useState([]);
+  const [preSettleSnap, setPreSettleSnap] = useState(null);
   const [myId, setMyIdState] = useState(() => {
     const v = localStorage.getItem("myStudentId");
     return v ? Number(v) : null;
@@ -63,13 +64,14 @@ export default function App() {
     finally { savingRef.current--; }
   }, []);
 
-  function applyDocs(stu, tx, meta, evt, tkt) {
+  function applyDocs(stu, tx, meta, evt, tkt, snap) {
     if (stu?.data) {
       setStudents(JSON.parse(stu.data));
       setTxs(tx?.data ? JSON.parse(tx.data) : []);
       if (meta) { setWeek(meta.w || 1); setMission(meta.m || ""); }
       setEvts(evt?.data ? JSON.parse(evt.data) : []);
       setTicketLog(tkt?.data ? JSON.parse(tkt.data) : []);
+      setPreSettleSnap(snap?.data ? JSON.parse(snap.data) : null);
       return true;
     }
     return false;
@@ -78,7 +80,7 @@ export default function App() {
   useEffect(() => {
     (async () => {
       try {
-        const docs = await batchGetDocs(["students", "txs", "meta", "evts", "tickets"]);
+        const docs = await batchGetDocs(["students", "txs", "meta", "evts", "tickets", "snapshot"]);
         if (!applyDocs(...docs)) resetLocal();
       } catch (err) {
         console.error("Firestore load error:", err);
@@ -89,7 +91,7 @@ export default function App() {
   }, []);
 
   function resetLocal() {
-    setStudents([]); setTxs([]); setWeek(1); setMission(""); setEvts([]); setTicketLog([]);
+    setStudents([]); setTxs([]); setWeek(1); setMission(""); setEvts([]); setTicketLog([]); setPreSettleSnap(null);
   }
 
   function loadSample() {
@@ -157,7 +159,20 @@ export default function App() {
     }
   }
 
+  async function saveSnapshot(snap) {
+    setPreSettleSnap(snap);
+    savingRef.current++;
+    try {
+      await saveDoc("snapshot", { data: snap ? JSON.stringify(snap) : "" });
+      lastSaveAt.current = Date.now();
+    } catch (err) { console.error("Snapshot save error:", err); }
+    finally { savingRef.current--; }
+  }
+
   function settle() {
+    const snap = { students, txs, week, mission, evts, savedAt: new Date().toLocaleString("ko-KR") };
+    saveSnapshot(snap);
+
     const n = students.length;
     const sorted = [...students].sort((a, b) => (b.pv || 0) - (a.pv || 0));
     const t30 = Math.max(1, Math.floor(n * 0.3));
@@ -201,11 +216,20 @@ export default function App() {
     persist(up, txs, week + 1, "", evts);
   }
 
+  function undoSettle() {
+    if (!preSettleSnap) return false;
+    const { students: s, txs: t, week: w, mission: m, evts: e } = preSettleSnap;
+    persist(s, t, w, m, e);
+    saveSnapshot(null);
+    return true;
+  }
+
   function resetAll() {
     if (!window.confirm("모든 데이터를 초기화합니까?")) return;
     try {
       resetLocal();
       save([], [], 1, "", [], []);
+      saveDoc("snapshot", { data: "" }).catch(err => console.error("Snapshot reset error:", err));
       window.alert("초기화가 완료되었습니다!");
     } catch (err) { window.alert("초기화 오류: " + err.message); }
   }
@@ -226,7 +250,7 @@ export default function App() {
       if (savingRef.current > 0) return;
       if (Date.now() - lastSaveAt.current < 3000) return;
       try {
-        const docs = await batchGetDocs(["students", "txs", "meta", "evts", "tickets"]);
+        const docs = await batchGetDocs(["students", "txs", "meta", "evts", "tickets", "snapshot"]);
         applyDocs(...docs);
       } catch (err) { console.debug("Poll error:", err.message); }
     }, 20000);
@@ -271,7 +295,7 @@ export default function App() {
     students, setStudents: s => persist(s, txs, week, mission, evts),
     txs, week, mission, setMission: m => persist(students, txs, week, m, evts),
     evts, setEvts: e => persist(students, txs, week, mission, e),
-    persist, portfolioVal, doTrade, settle, resetAll, loadSample,
+    persist, portfolioVal, doTrade, settle, undoSettle, preSettleSnap, resetAll, loadSample,
     showAdd, setShowAdd, showReport, setShowReport,
     ticketLog, saveTickets, selStudent, setSelStudent,
     isMobile, myId, setMyId, isAdmin,

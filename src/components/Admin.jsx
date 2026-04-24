@@ -9,7 +9,7 @@ import EmojiPicker from "./EmojiPicker";
 import ReportOverlay from "./ReportOverlay";
 
 export default function Admin() {
-  const { students, setStudents, week, mission, setMission, evts, setEvts, settle, resetAll, loadSample, showAdd, setShowAdd, persist, txs, showReport, setShowReport, portfolioVal, ticketLog, saveTickets, isMobile } = useApp();
+  const { students, setStudents, week, mission, setMission, evts, setEvts, settle, undoSettle, preSettleSnap, resetAll, loadSample, showAdd, setShowAdd, persist, txs, showReport, setShowReport, portfolioVal, ticketLog, saveTickets, isMobile } = useApp();
   const [sub, setSub] = useState("ticket");
   const [nm, setNm] = useState(mission);
   const [ed, setEd] = useState("");
@@ -669,7 +669,18 @@ export default function Admin() {
             })}
           </div>
           <button onClick={settle} style={{ width: "100%", padding: 16, background: "linear-gradient(135deg, #7c3aed, #8b5cf6)", border: "none", borderRadius: 12, color: "#fff", fontSize: 16, fontWeight: 800, cursor: "pointer", letterSpacing: 1 }}>🔔 {week}주차 정산 실행!</button>
-          <div style={{ textAlign: "center", marginTop: 8, fontSize: 11, color: "#64748b" }}>⚠️ 정산 후 되돌릴 수 없습니다</div>
+          {preSettleSnap ? (
+            <div style={{ marginTop: 14, padding: 12, background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 10 }}>
+              <div style={{ fontSize: 12, color: "#991b1b", marginBottom: 8, fontWeight: 600 }}>↩️ 직전 정산 복원 가능</div>
+              <div style={{ fontSize: 11, color: "#7f1d1d", marginBottom: 10, lineHeight: 1.5 }}>
+                {preSettleSnap.week}주차 정산 직전 상태로 되돌립니다.
+                <br />⚠️ 정산 이후 발생한 <b>모든 거래 내역도 함께 취소</b>됩니다.
+              </div>
+              <button onClick={() => { if (window.confirm(`${preSettleSnap.week}주차 정산을 취소하시겠습니까?\n정산 이후의 거래 내역도 모두 사라집니다.`)) undoSettle(); }} style={{ width: "100%", padding: 10, background: "#dc2626", border: "none", borderRadius: 8, color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>정산 취소하고 이전으로 돌리기</button>
+            </div>
+          ) : (
+            <div style={{ textAlign: "center", marginTop: 8, fontSize: 11, color: "#64748b" }}>⚠️ 정산 후 즉시 1회에 한해 취소 가능합니다</div>
+          )}
         </Card>
       )}
 
