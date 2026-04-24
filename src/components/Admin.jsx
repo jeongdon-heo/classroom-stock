@@ -82,6 +82,46 @@ export default function Admin() {
     setEd(""); setEt([]); setEa(200);
   };
 
+  const fixVoteBug = () => {
+    const nStr = window.prompt(
+      "투표 없이 실행된 정산이 몇 번 있었나요?\n" +
+      "(예: 1주차에만 투표했고 그 뒤 4주차까지 정산했다면 3)",
+      "3"
+    );
+    if (!nStr) return;
+    const nBug = parseInt(nStr, 10);
+    if (!Number.isFinite(nBug) || nBug < 1) { window.alert("올바른 숫자를 입력해주세요"); return; }
+    const total = students.length;
+    if (total < 2) { window.alert("학생이 너무 적어서 보정할 수 없습니다"); return; }
+    const t30 = Math.max(1, Math.floor(total * 0.3));
+    const b30 = Math.max(1, Math.floor(total * 0.3));
+    const corrections = students.map((s, i) => {
+      let delta = 0;
+      if (i < t30) delta = -300 * nBug;
+      else if (i >= total - b30) delta = 200 * nBug;
+      return { id: s.id, delta };
+    });
+    const preview = students.map((s, i) => {
+      const c = corrections.find(x => x.id === s.id);
+      const np = Math.max(100, s.stockPrice + c.delta);
+      const tag = i < t30 ? "[상위]" : i >= total - b30 ? "[하위]" : "[중간]";
+      return `${tag} ${s.emoji} ${s.name}: ${s.stockPrice.toLocaleString()} → ${np.toLocaleString()} (${c.delta >= 0 ? "+" : ""}${c.delta})`;
+    }).join("\n");
+    if (!window.confirm(
+      `⚠️ ${nBug}회 분량 보정을 적용합니다.\n` +
+      `학생 순서 기준: 상위 ${t30}명은 -${300 * nBug}원, 하위 ${b30}명은 +${200 * nBug}원.\n` +
+      `현금/배당은 보정되지 않습니다.\n\n` +
+      `${preview}\n\n적용할까요?`
+    )) return;
+    const up = students.map(s => {
+      const c = corrections.find(x => x.id === s.id);
+      const newPrice = Math.max(100, s.stockPrice + c.delta);
+      return { ...s, stockPrice: newPrice, history: [...s.history, { week, price: newPrice, label: "투표버그 보정" }] };
+    });
+    persist(up, txs, week, mission, evts);
+    window.alert("보정이 완료되었습니다.");
+  };
+
   const subs = [
     { id: "ticket", label: "행운권 환전", icon: <Gift size={15} /> },
     { id: "points", label: "포인트", icon: <Star size={15} /> },
@@ -643,12 +683,15 @@ export default function Admin() {
             </div>
             {students.map(s => {
               const mb = GRADES[s.mg] || 0;
+              const totalVotes = students.reduce((sum, x) => sum + (x.pv || 0), 0);
               const vs = [...students].sort((a, b) => (b.pv || 0) - (a.pv || 0));
               const rk = vs.findIndex(x => x.id === s.id);
               const n = students.length;
               let pb = 100;
-              if (rk < Math.max(1, Math.floor(n * 0.3))) pb = 400;
-              else if (rk >= n - Math.max(1, Math.floor(n * 0.3))) pb = -100;
+              if (totalVotes > 0) {
+                if (rk < Math.max(1, Math.floor(n * 0.3))) pb = 400;
+                else if (rk >= n - Math.max(1, Math.floor(n * 0.3))) pb = -100;
+              }
               const tot = (s.tp || 0) + mb + pb;
               const newPrice = Math.max(100, s.stockPrice + tot);
               const salary = Math.round(newPrice * SALARY_RATE);
@@ -681,6 +724,14 @@ export default function Admin() {
           ) : (
             <div style={{ textAlign: "center", marginTop: 8, fontSize: 11, color: "#64748b" }}>⚠️ 정산 후 즉시 1회에 한해 취소 가능합니다</div>
           )}
+          <div style={{ marginTop: 14, padding: 12, background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 10 }}>
+            <div style={{ fontSize: 12, color: "#92400e", marginBottom: 6, fontWeight: 600 }}>🛠️ 투표 버그 일회성 보정</div>
+            <div style={{ fontSize: 11, color: "#78350f", marginBottom: 10, lineHeight: 1.5 }}>
+              투표 없이 정산하면 학생 명단 순서대로 상위 30%에 +400원, 하위 30%에 -100원이 잘못 적용되던 버그가 있었습니다.
+              <br />아래 버튼으로 해당 주가 차이만 보정합니다. <b>현금/배당은 보정되지 않습니다.</b>
+            </div>
+            <button onClick={fixVoteBug} style={{ width: "100%", padding: 10, background: "#f59e0b", border: "none", borderRadius: 8, color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>잘못 적용된 투표 결과 보정</button>
+          </div>
         </Card>
       )}
 

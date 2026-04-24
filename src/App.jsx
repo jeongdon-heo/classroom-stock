@@ -174,6 +174,7 @@ export default function App() {
     saveSnapshot(snap);
 
     const n = students.length;
+    const totalVotes = students.reduce((sum, s) => sum + (s.pv || 0), 0);
     const sorted = [...students].sort((a, b) => (b.pv || 0) - (a.pv || 0));
     const t30 = Math.max(1, Math.floor(n * 0.3));
     const b30 = Math.max(1, Math.floor(n * 0.3));
@@ -182,8 +183,10 @@ export default function App() {
     for (const s of students) {
       const rank = sorted.findIndex(x => x.id === s.id);
       let pb = 100;
-      if (rank < t30) pb = 400;
-      else if (rank >= n - b30) pb = -100;
+      if (totalVotes > 0) {
+        if (rank < t30) pb = 400;
+        else if (rank >= n - b30) pb = -100;
+      }
       const mb = GRADES[s.mg] || 0;
       const total = (s.tp || 0) + mb + pb;
       priceMap.set(s.id, Math.max(100, s.stockPrice + total));
