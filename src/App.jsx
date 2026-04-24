@@ -291,9 +291,9 @@ export default function App() {
           </div>
         </div>
         {!isAdmin && me ? (
-          <button onClick={() => { if (window.confirm("내 계정 선택을 해제할까요?")) setMyId(null); }} title="내 계정 전환" style={{ background: "rgba(255,255,255,0.2)", border: "none", borderRadius: 20, padding: "4px 12px", fontSize: isMobile ? 11 : 12, color: "#ffffff", maxWidth: isMobile ? 150 : 220, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", cursor: "pointer" }}>
-            {me.emoji} {me.name} 🔄
-          </button>
+          <div style={{ background: "rgba(255,255,255,0.2)", borderRadius: 20, padding: "4px 12px", fontSize: isMobile ? 11 : 12, color: "#ffffff", maxWidth: isMobile ? 150 : 220, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            {me.emoji} {me.name}
+          </div>
         ) : (
           <div style={{ background: "rgba(255,255,255,0.2)", borderRadius: 20, padding: "4px 12px", fontSize: isMobile ? 11 : 12, color: "#ffffff", maxWidth: isMobile ? 150 : 220, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
             📋 {mission || "미션 미설정"}
