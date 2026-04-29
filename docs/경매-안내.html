@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔨 4-2 주식회사 - 과자 경매 안내</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: #f8f9fc;
+    color: #2d3748;
+    line-height: 1.8;
+    font-size: 15px;
+  }
+
+  .page {
+    max-width: 720px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 48px 40px;
+  }
+
+  /* 인쇄 설정 */
+  @media print {
+    body { background: #fff; font-size: 13px; }
+    .page { padding: 20px 10px; max-width: 100%; }
+    .no-print { display: none !important; }
+    .step-card { break-inside: avoid; }
+    h2 { break-after: avoid; }
+    @page { margin: 15mm 10mm; }
+  }
+
+  .print-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    padding: 14px 28px;
+    background: linear-gradient(135deg, #d97706, #f59e0b);
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(217,119,6,0.35);
+    font-family: 'Noto Sans KR', sans-serif;
+    z-index: 100;
+  }
+  .print-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(217,119,6,0.45); }
+
+  /* 타이틀 */
+  .title-section {
+    text-align: center;
+    padding: 32px 0 28px;
+    border-bottom: 3px solid #d97706;
+    margin-bottom: 36px;
+  }
+  .title-emoji { font-size: 56px; margin-bottom: 8px; }
+  .title-main {
+    font-size: 32px;
+    font-weight: 900;
+    color: #1a202c;
+    letter-spacing: -0.5px;
+  }
+  .title-sub {
+    font-size: 16px;
+    color: #92400e;
+    margin-top: 6px;
+    font-weight: 500;
+  }
+
+  /* 섹션 */
+  h2 {
+    font-size: 22px;
+    font-weight: 800;
+    color: #1a202c;
+    margin: 40px 0 16px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  h2 .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    background: linear-gradient(135deg, #d97706, #f59e0b);
+    color: #fff;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+
+  h3 {
+    font-size: 17px;
+    font-weight: 700;
+    color: #2d3748;
+    margin: 20px 0 10px;
+  }
+
+  p { margin-bottom: 12px; }
+
+  /* 스텝 카드 */
+  .step-card {
+    background: #f7f8fc;
+    border: 1px solid #e8ecf4;
+    border-radius: 14px;
+    padding: 20px 24px;
+    margin: 14px 0;
+  }
+  .step-card.highlight {
+    background: linear-gradient(135deg, #fffbeb, #fef3c7);
+    border-color: #fde68a;
+  }
+  .step-card.warning {
+    background: #fff8f0;
+    border-color: #fed7aa;
+  }
+  .step-card.success {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+  }
+
+  .step-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #d97706;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* 테이블 */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 14px;
+  }
+  th, td {
+    padding: 10px 14px;
+    text-align: center;
+    border: 1px solid #e2e8f0;
+  }
+  th {
+    background: #fef3c7;
+    font-weight: 700;
+    color: #92400e;
+    font-size: 13px;
+  }
+  td { color: #334155; }
+  tr:nth-child(even) td { background: #fafbfd; }
+
+  /* 예시 박스 */
+  .example-box {
+    background: #fffbeb;
+    border: 1px dashed #f59e0b;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin: 14px 0;
+    font-size: 14px;
+  }
+  .example-box .label {
+    font-weight: 700;
+    color: #d97706;
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+
+  /* 대화 박스 (경매 진행 예시) */
+  .dialog {
+    background: #f8fafc;
+    border-left: 4px solid #d97706;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 10px 0;
+    font-size: 14px;
+  }
+  .dialog .who {
+    font-weight: 700;
+    color: #b45309;
+    margin-right: 6px;
+  }
+
+  /* 용어 */
+  .term {
+    display: inline-block;
+    background: #fef3c7;
+    color: #92400e;
+    padding: 2px 10px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  /* 리스트 */
+  ul, ol {
+    padding-left: 22px;
+    margin: 8px 0 14px;
+  }
+  li { margin-bottom: 6px; }
+
+  /* 강조 */
+  strong { color: #1e293b; }
+  em { color: #b45309; font-style: normal; font-weight: 600; }
+
+  /* 플로우 */
+  .flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 16px 0;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .flow-item {
+    background: #fef3c7;
+    padding: 8px 16px;
+    border-radius: 10px;
+    color: #92400e;
+    text-align: center;
+  }
+  .flow-arrow { color: #94a3b8; font-size: 20px; }
+
+  /* 팁 박스 */
+  .tip-box {
+    background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+    border: 1px solid #86efac;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin: 14px 0;
+  }
+  .tip-box .tip-title {
+    font-weight: 700;
+    color: #15803d;
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  /* 주의 박스 */
+  .warn-box {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin: 14px 0;
+  }
+  .warn-box .warn-title {
+    font-weight: 700;
+    color: #b91c1c;
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  /* Q&A */
+  .qa { margin: 12px 0; }
+  .qa .q {
+    background: #eef2ff;
+    color: #4338ca;
+    padding: 10px 14px;
+    border-radius: 10px 10px 0 0;
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .qa .a {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-top: none;
+    padding: 12px 16px;
+    border-radius: 0 0 10px 10px;
+    font-size: 14px;
+  }
+
+  .footer {
+    text-align: center;
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 2px solid #e2e8f0;
+    color: #94a3b8;
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+<button class="print-btn no-print" onclick="window.print()">🖨️ 인쇄하기</button>
+
+<div class="page">
+
+  <!-- 타이틀 -->
+  <div class="title-section">
+    <div class="title-emoji">🔨</div>
+    <div class="title-main">과자 경매 안내</div>
+    <div class="title-sub">학기말 주주총회 - 4-2 주식회사</div>
+  </div>
+
+  <p style="text-align:center; font-size:15px; color:#475569;">
+    한 학기 동안 모은 <strong>가상 화폐</strong>를 사용해서<br/>
+    프리미엄 과자를 두고 친구들과 정정당당하게 경쟁하는 시간이에요!
+  </p>
+
+
+  <!-- 1. 경매란? -->
+  <h2><span class="num">1</span> 경매가 뭐예요?</h2>
+
+  <p>
+    <span class="term">경매</span>란 한 가지 물건을 두고 여러 명이 가격을 부르며 경쟁해서, <strong>가장 비싼 값을 부른 사람이 가져가는</strong> 거래 방식이에요.
+  </p>
+
+  <div class="step-card">
+    <div class="step-title">🎯 우리 반 경매의 특징</div>
+    <ul>
+      <li>학기 끝, <strong>주주총회 날</strong> 한 번 열려요.</li>
+      <li>모은 <strong>가상 화폐</strong>로만 입찰할 수 있어요. (현금 안 됨!)</li>
+      <li>한 번에 <strong>물건 하나씩</strong> 진행해요. 끝나면 다음 물건!</li>
+      <li>낙찰되면 <strong>그 자리에서 잔액이 깎이고</strong> 과자를 받아요.</li>
+    </ul>
+  </div>
+
+  <div class="tip-box">
+    <div class="tip-title">💡 왜 경매를 해요?</div>
+    학기 동안 열심히 활동해서 모은 가상 화폐를 마지막에 멋지게 쓰는 시간이에요. 주식으로 번 돈, 월급, 행운권으로 모은 돈... 모두 여기서 빛을 발할 수 있어요!
+  </div>
+
+
+  <!-- 2. 진행 흐름 -->
+  <h2><span class="num">2</span> 어떻게 진행돼요?</h2>
+
+  <div class="flow">
+    <div class="flow-item">물품 공개</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">시작가 발표</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">입찰 경쟁</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-item">낙찰!</div>
+  </div>
+
+  <div class="step-card highlight">
+    <div class="step-title">📺 1단계 — 물품 공개</div>
+    선생님이 칠판 앞 화면에 <strong>경매 물품</strong>을 띄워요. (예: 🍫 빼빼로 대형, 🍪 과자 선물세트)<br/>
+    물품 이름과 <strong>시작가</strong>(=처음 부르는 가격)가 함께 나와요.
+  </div>
+
+  <div class="step-card highlight">
+    <div class="step-title">🙋 2단계 — 입찰 경쟁</div>
+    사고 싶은 사람은 <strong>손을 들고 가격을 외쳐요</strong>.<br/>
+    한 번 외칠 때마다 <strong>100원씩만</strong> 올릴 수 있어요.<br/>
+    선생님이 그때그때 화면에 <strong>"현재 입찰가"</strong>와 <strong>"최고 입찰자 이름"</strong>을 표시해 줘요.
+  </div>
+
+  <div class="step-card highlight">
+    <div class="step-title">🔨 3단계 — 낙찰!</div>
+    아무도 더 비싸게 부르지 않으면 선생님이 외쳐요.<br/>
+    <strong>"하나... 둘... 셋, 낙찰!"</strong><br/>
+    그 순간 가장 비싸게 부른 사람이 <em>낙찰자</em>가 되고, <strong>잔액에서 그 금액만큼 자동으로 차감</strong>돼요.
+  </div>
+
+
+  <!-- 3. 입찰 규칙 -->
+  <h2><span class="num">3</span> 꼭 지켜야 할 규칙</h2>
+
+  <table>
+    <thead>
+      <tr><th>항목</th><th>규칙</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>시작가</strong></td><td>물품마다 다름 (보통 500원)</td></tr>
+      <tr><td><strong>입찰 단위</strong></td><td><em>100원씩만</em> 올릴 수 있어요</td></tr>
+      <tr><td><strong>최대 입찰가</strong></td><td>내 <strong>가상 화폐 잔액</strong>까지만</td></tr>
+      <tr><td><strong>입찰 취소</strong></td><td>한 번 부르면 <em>되돌릴 수 없어요</em>!</td></tr>
+      <tr><td><strong>낙찰 후</strong></td><td>금액 차감 + 과자 수령</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warn-box">
+    <div class="warn-title">⚠️ 신중하게 부르기</div>
+    <ul>
+      <li>친구가 부른 가격보다 100원만 더 부를 수 있어요. 갑자기 1,000원씩 올릴 수 없습니다.</li>
+      <li>잔액보다 비싸게는 부를 수 없어요. (선생님 화면에 자동으로 막혀요)</li>
+      <li>장난으로 막 부르면 진짜 낙찰돼서 돈이 빠져나가요. <strong>진심으로 사고 싶을 때만</strong> 손 드세요!</li>
+    </ul>
+  </div>
+
+
+  <!-- 4. 진행 예시 -->
+  <h2><span class="num">4</span> 진행 모습 (예시)</h2>
+
+  <p style="font-size:14px; color:#64748b;">🍫 <strong>빼빼로 대형</strong> · 시작가 500원</p>
+
+  <div class="dialog"><span class="who">선생님:</span> 자, 빼빼로 대형! 시작가 500원! 사고 싶은 사람~?</div>
+  <div class="dialog"><span class="who">민준:</span> (손 들고) <strong>500원!</strong></div>
+  <div class="dialog"><span class="who">선생님:</span> 민준이 500원! 더 부를 사람?</div>
+  <div class="dialog"><span class="who">서연:</span> <strong>600원!</strong></div>
+  <div class="dialog"><span class="who">민준:</span> <strong>700원!</strong></div>
+  <div class="dialog"><span class="who">서연:</span> <strong>800원!</strong></div>
+  <div class="dialog"><span class="who">민준:</span> ...(잔액 부족, 포기)</div>
+  <div class="dialog"><span class="who">선생님:</span> 서연 800원! 더 없으면 하나... 둘... 셋, <strong>낙찰!</strong> 🔨</div>
+
+  <div class="example-box">
+    <div class="label">💰 결과</div>
+    서연 잔액에서 <strong>800원이 차감</strong>되고, 빼빼로 대형은 서연이 가져갑니다!<br/>
+    민준은 한 푼도 안 깎였어요. (입찰만 하고 낙찰 안 됐으니까!)
+  </div>
+
+
+  <!-- 5. 작전/팁 -->
+  <h2><span class="num">5</span> 똑똑한 입찰 작전</h2>
+
+  <div class="tip-box">
+    <div class="tip-title">💡 작전 1 — 예산 미리 정하기</div>
+    경매 시작 전에 <strong>"이 과자는 최대 ○○원까지!"</strong> 마음속으로 정해두세요. 분위기에 휩쓸려서 잔액을 다 써버리면 다음 물품을 못 사요!
+  </div>
+
+  <div class="tip-box">
+    <div class="tip-title">💡 작전 2 — 좋아하는 물건은 뒤에 사기?</div>
+    내가 정말 갖고 싶은 물건이 마지막에 나온다면, 앞 경매는 <em>참거나</em> 적게 쓰고 잔액을 모아두는 것도 방법이에요. 단, 다른 친구도 같은 생각일 수 있으니 잘 판단!
+  </div>
+
+  <div class="tip-box">
+    <div class="tip-title">💡 작전 3 — 잔액 미리 확인하기</div>
+    경매 전에 <strong>내 가상 화폐 잔액</strong>을 학생 앱에서 확인하세요. 1,200원밖에 없는데 1,000원짜리 과자에 1,500원 부르면 그 입찰은 무효예요.
+  </div>
+
+  <div class="warn-box">
+    <div class="warn-title">⚠️ 흥분하지 말기</div>
+    경쟁이 붙으면 친구를 이기고 싶어서 가격이 점점 올라가요. 그 과자가 <strong>그만큼의 가치가 있는지</strong> 한 번 더 생각하세요. 마트에서 1,500원짜리를 가상 화폐로 5,000원 주고 사는 건 손해겠죠?
+  </div>
+
+
+  <!-- 6. 자주 묻는 질문 -->
+  <h2><span class="num">6</span> 자주 묻는 질문</h2>
+
+  <div class="qa">
+    <div class="q">Q. 입찰만 하고 낙찰 안 되면 돈이 빠져나가나요?</div>
+    <div class="a">아니요! <strong>낙찰자만 돈이 차감</strong>돼요. 중간에 부른 가격은 잔액에 영향이 없어요.</div>
+  </div>
+
+  <div class="qa">
+    <div class="q">Q. 한 번 입찰했다가 취소할 수 있나요?</div>
+    <div class="a">아니요. 한 번 부르면 <strong>되돌릴 수 없어요</strong>. 그래서 신중하게 부르라는 거예요!</div>
+  </div>
+
+  <div class="qa">
+    <div class="q">Q. 한 사람이 여러 개 살 수 있나요?</div>
+    <div class="a">네, 잔액만 충분하면 가능해요. 매 경매마다 따로 진행되니까 매번 입찰하면 돼요.</div>
+  </div>
+
+  <div class="qa">
+    <div class="q">Q. 친구랑 돈 합쳐서 같이 살 수 있나요?</div>
+    <div class="a">선생님과 미리 상의하세요. 원칙은 <strong>한 명이 한 물품을 낙찰</strong>하지만, 사이좋게 나눠 먹는 건 자유예요.</div>
+  </div>
+
+  <div class="qa">
+    <div class="q">Q. 경매가 끝났는데 내 잔액이 남아요. 어떻게 되나요?</div>
+    <div class="a">학기말이라 잔액은 사라져요. 그러니 <strong>경매에서 다 쓰는 것도 좋은 선택</strong>이에요. (단, 너무 비싸게는 X)</div>
+  </div>
+
+  <div class="qa">
+    <div class="q">Q. 갖고 싶은 과자가 안 나왔어요!</div>
+    <div class="a">경매 물품은 미리 정해져 있어요. 다음 학기엔 어떤 물품을 올렸으면 좋겠는지 선생님께 의견을 줘도 좋아요.</div>
+  </div>
+
+
+  <!-- 마무리 -->
+  <h2><span class="num">7</span> 마무리</h2>
+
+  <div class="step-card success">
+    <div class="step-title">🎉 즐겁게, 정정당당하게!</div>
+    <p style="margin:0;">
+      경매는 한 학기를 마무리하는 <strong>축제</strong>예요. 이기고 지는 게 중요한 게 아니라,<br/>
+      <em>내가 모은 가상 화폐를 어떻게 쓸지</em> 스스로 판단하는 경험이 진짜 보상이에요.<br/><br/>
+      친구가 낙찰됐다고 부러워하지 말고, 박수 쳐주기! 👏<br/>
+      한 학기 동안 모두 수고했어요!
+    </p>
+  </div>
+
+  <div class="footer">
+    🔨 4-2 주식회사 · 학기말 주주총회 과자 경매<br/>
+    경매 진행은 선생님 화면에서 이루어지며, 입찰가/낙찰자가 실시간으로 표시됩니다.
+  </div>
+
+</div>
+
+</body>
+</html>
