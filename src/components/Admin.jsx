@@ -812,7 +812,7 @@ export default function Admin() {
               </div>
 
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 6, marginBottom: 16 }}>
-                {students.map(s => {
+                {[...students].sort((a, b) => a.name.localeCompare(b.name, "ko")).map(s => {
                   const nextBid = aucActive.currentBid + 100;
                   const canBid = s.cash >= nextBid;
                   const isHighest = s.id === aucActive.bidderId;
