@@ -253,8 +253,11 @@ export default function App() {
     const id = setInterval(async () => {
       if (savingRef.current > 0) return;
       if (Date.now() - lastSaveAt.current < 3000) return;
+      const fetchStart = Date.now();
       try {
         const docs = await batchGetDocs(["students", "txs", "meta", "evts", "tickets", "snapshot"]);
+        // fetch 도중 로컬 저장이 시작/완료됐다면 가져온 데이터가 stale일 수 있어 적용 스킵
+        if (savingRef.current > 0 || lastSaveAt.current > fetchStart) return;
         applyDocs(...docs);
       } catch (err) { console.debug("Poll error:", err.message); }
     }, 20000);
