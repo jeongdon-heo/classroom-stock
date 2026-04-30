@@ -820,8 +820,8 @@ export default function Admin() {
                     <button key={s.id} disabled={!canBid || isHighest} onClick={() => {
                       setAucActive({ ...aucActive, currentBid: aucActive.currentBid + 100, bidderId: s.id, bidderName: s.name });
                     }} style={{ padding: "8px 10px", background: isHighest ? "#f0fdf4" : canBid ? "#eef2ff" : "rgba(100,130,255,0.02)", border: `1px solid ${isHighest ? "#86efac" : canBid ? "#e2e8f0" : "#f1f5f9"}`, borderRadius: 8, color: isHighest ? "#16a34a" : canBid ? "#1e293b" : "#cbd5e1", cursor: canBid && !isHighest ? "pointer" : "default", fontSize: 12, opacity: canBid ? 1 : 0.4, textAlign: "left" }}>
-                      <div style={{ fontWeight: 600 }}>{s.emoji} {s.name}</div>
-                      <div style={{ fontSize: 10, color: "#64748b" }}>💰{s.cash.toLocaleString()}</div>
+                      <div style={{ fontWeight: 600, fontSize: 18 }}>{s.emoji} {s.name}</div>
+                      <div style={{ fontSize: 15, color: "#64748b" }}>💰{s.cash.toLocaleString()}</div>
                     </button>
                   );
                 })}
